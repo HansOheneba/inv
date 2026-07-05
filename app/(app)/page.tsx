@@ -23,13 +23,13 @@ export default async function DashboardPage() {
   const firstName = profile.full_name?.split(" ")[0] || "there";
 
   return (
-    <div className="space-y-4 px-3 py-3">
+    <div className="mx-auto max-w-7xl space-y-5 px-6 py-6">
       <div>
         <h1 className="text-page-title font-semibold">Hi, {firstName}</h1>
         <p className="text-meta text-muted-foreground">Here&apos;s how the business looks today.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {owner ? (
           <KpiCard
             icon={Wallet}

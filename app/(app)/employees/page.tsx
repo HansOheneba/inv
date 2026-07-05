@@ -25,8 +25,8 @@ export default async function EmployeesPage() {
   const employees = await getEmployees();
 
   return (
-    <div className="px-3 py-3">
-      <div className="mb-3">
+    <div className="mx-auto max-w-7xl px-6 py-6">
+      <div className="mb-4">
         <h1 className="text-page-title font-semibold">Team</h1>
         <p className="text-meta text-muted-foreground">
           {employees.length} people with access to Stockline
@@ -70,14 +70,14 @@ export default async function EmployeesPage() {
                     name="nextRole"
                     value={employee.role === "owner" ? "employee" : "owner"}
                   />
-                  <Button type="submit" variant="outline" size="sm" className="text-btn">
+                  <Button type="submit" variant="outline" size="sm">
                     Make {employee.role === "owner" ? "employee" : "owner"}
                   </Button>
                 </form>
                 <form action={toggleEmployeeActiveAction}>
                   <input type="hidden" name="profileId" value={employee.id} />
                   <input type="hidden" name="active" value={String(employee.active)} />
-                  <Button type="submit" variant="ghost" size="sm" className="text-btn">
+                  <Button type="submit" variant="ghost" size="sm">
                     {employee.active ? "Deactivate" : "Activate"}
                   </Button>
                 </form>

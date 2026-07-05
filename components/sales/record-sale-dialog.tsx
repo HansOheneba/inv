@@ -47,7 +47,7 @@ export function RecordSaleDialog({ options }: { options: SaleFormOptions }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button size="sm" className="gap-1.5 text-btn" />}>
+      <DialogTrigger render={<Button size="sm" className="gap-1.5" />}>
         <Plus className="size-4" />
         Record sale
       </DialogTrigger>

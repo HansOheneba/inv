@@ -74,7 +74,7 @@ export default async function LoginPage({
                   required
                 />
               </Field>
-              <Button type="submit" className="w-full text-btn">
+              <Button type="submit" className="w-full">
                 Sign in
               </Button>
             </FieldGroup>

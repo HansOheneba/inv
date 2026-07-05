@@ -13,8 +13,8 @@ export default async function ShipmentsPage() {
   ]);
 
   return (
-    <div className="px-3 py-3">
-      <div className="mb-3">
+    <div className="mx-auto max-w-7xl px-6 py-6">
+      <div className="mb-4">
         <h1 className="text-page-title font-semibold">Shipments</h1>
         <p className="text-meta text-muted-foreground">Track what&apos;s on the way from your suppliers.</p>
       </div>

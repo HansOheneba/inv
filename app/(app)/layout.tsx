@@ -1,15 +1,21 @@
+import { cookies } from "next/headers";
 import { getCurrentProfile, isOwner } from "@/lib/auth";
-import { TopBar } from "@/components/app-shell/top-bar";
-import { BottomNav } from "@/components/app-shell/bottom-nav";
+import { AppSidebar } from "@/components/app-shell/app-sidebar";
+import { SiteHeader } from "@/components/app-shell/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const profile = await getCurrentProfile();
+  const cookieStore = await cookies();
+  const sidebarOpen = cookieStore.get("sidebar_state")?.value !== "false";
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <TopBar profile={profile} />
-      <main className="flex-1 pb-16">{children}</main>
-      <BottomNav showEmployees={isOwner(profile)} />
-    </div>
+    <SidebarProvider defaultOpen={sidebarOpen}>
+      <AppSidebar profile={profile} showEmployees={isOwner(profile)} />
+      <SidebarInset>
+        <SiteHeader />
+        <main className="flex-1">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

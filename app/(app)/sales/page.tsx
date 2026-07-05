@@ -29,8 +29,8 @@ export default async function SalesPage() {
     .reduce((sum, s) => sum + s.totalAmount, 0);
 
   return (
-    <div className="px-3 py-3">
-      <div className="mb-3 flex items-center justify-between gap-3">
+    <div className="mx-auto max-w-7xl px-6 py-6">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-page-title font-semibold">Sales</h1>
           <p className="text-meta text-muted-foreground">

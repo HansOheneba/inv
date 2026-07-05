@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { getInventoryOverview } from "@/lib/data/inventory";
 import { getLocations } from "@/lib/data/locations";
 import { getCurrentProfile, isOwner } from "@/lib/auth";
-import { InventoryList } from "@/components/inventory/inventory-list";
+import { InventoryTable } from "@/components/inventory/inventory-table";
 import { DensityToggle } from "@/components/inventory/density-toggle";
 import { DENSITY_COOKIE, parseDensity } from "@/lib/density";
 
@@ -21,8 +21,8 @@ export default async function InventoryPage() {
   const outCount = items.filter((item) => item.status === "out").length;
 
   return (
-    <div className="flex h-[calc(100dvh-3rem-3.5rem)] flex-col">
-      <div className="flex items-center justify-between gap-3 border-b px-3 py-2.5">
+    <div className="mx-auto max-w-7xl px-6 py-6">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-page-title font-semibold">Inventory</h1>
           <p className="text-meta text-muted-foreground">
@@ -34,7 +34,7 @@ export default async function InventoryPage() {
         <DensityToggle initial={density} />
       </div>
 
-      <InventoryList items={items} locations={locations} showCosts={owner} />
+      <InventoryTable items={items} locations={locations} showCosts={owner} />
     </div>
   );
 }

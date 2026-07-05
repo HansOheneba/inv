@@ -36,7 +36,7 @@ export function ShipmentsView({
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-3 w-full overflow-x-auto">
           {TABS.map((t) => (
-            <TabsTrigger key={t.value} value={t.value} className="text-btn">
+            <TabsTrigger key={t.value} value={t.value}>
               {t.label}
             </TabsTrigger>
           ))}

@@ -68,7 +68,7 @@ export function AdvanceShipmentButton({
           run(formData);
         }}
       >
-        <Button type="submit" size="sm" variant="outline" disabled={pending} className="text-btn">
+        <Button type="submit" size="sm" variant="outline" disabled={pending}>
           {pending ? "Updating…" : label}
         </Button>
       </form>
@@ -77,7 +77,7 @@ export function AdvanceShipmentButton({
 
   return (
     <>
-      <Button size="sm" variant="outline" className="text-btn" onClick={() => setOpen(true)}>
+      <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
         {label}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
