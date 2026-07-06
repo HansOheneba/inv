@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, Package, Receipt, Ship, User, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, Package, Receipt, Ship, Sparkles, User, Users } from "lucide-react";
 import { signOutAction } from "@/lib/actions/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +57,7 @@ export function AppSidebar({
     { href: "/inventory", label: "Inventory", icon: Package },
     { href: "/sales", label: "Sales", icon: Receipt },
     { href: "/shipments", label: "Shipments", icon: Ship },
+    { href: "/insights", label: "Kofi", icon: Sparkles },
     ...(showEmployees ? [{ href: "/employees", label: "Team", icon: Users }] : []),
   ];
 
