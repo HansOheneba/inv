@@ -1,8 +1,8 @@
-# Stockline
+# Raj Kollections
 
-A mobile-first inventory and operations tracker for a business that imports goods and sells
-through both online and physical stores. Built for fast scanning on the warehouse floor, not for
-looking pretty on a desktop dashboard.
+An inventory and operations dashboard for a business that imports goods and sells through both
+online and physical stores. A Shopify-style desktop dashboard with a dense, fast-scanning mobile
+mode for the warehouse floor.
 
 - **Next.js 16** (App Router, Turbopack) + **React 19**
 - **Tailwind CSS v4** with a density-first design system (compact rows, tight type scale)

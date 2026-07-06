@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stockline — Inventory & Ops",
+  title: "Raj Kollections — Inventory & Ops",
   description: "Track imports, stock, sales, and your team in real time.",
 };
 

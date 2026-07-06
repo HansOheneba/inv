@@ -1,6 +1,6 @@
 import type { BusinessSnapshot } from "@/lib/data/insights";
 
-export const KOFI_NAME = "Kofi";
+export const ATLAS_NAME = "Atlas";
 
 /** Small randomized delay so the demo "typing" indicator feels natural. */
 export function randomThinkingDelay() {
@@ -83,7 +83,7 @@ export function suggestedPrompts(snapshot: BusinessSnapshot): string[] {
  * talks about numbers already in `snapshot`, so it can't hallucinate —
  * it just can't answer anything outside that scope yet either.
  */
-export function answerKofi(question: string, snapshot: BusinessSnapshot, showCosts: boolean): string {
+export function answerAtlas(question: string, snapshot: BusinessSnapshot, showCosts: boolean): string {
   const q = question.toLowerCase();
 
   if (/(out of stock|out\b|reorder|restock|low stock|running low)/.test(q)) {

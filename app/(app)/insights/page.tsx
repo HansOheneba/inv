@@ -2,8 +2,8 @@ import { Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { getCurrentProfile, isOwner } from "@/lib/auth";
 import { getBusinessSnapshot } from "@/lib/data/insights";
-import { KofiChat } from "@/components/insights/kofi-chat";
-import { KOFI_NAME } from "@/lib/insights/kofi";
+import { AtlasChat } from "@/components/insights/atlas-chat";
+import { ATLAS_NAME } from "@/lib/insights/atlas";
 
 export default async function InsightsPage() {
   const profile = await getCurrentProfile();
@@ -17,7 +17,7 @@ export default async function InsightsPage() {
           <Sparkles className="size-4" />
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="text-page-title font-semibold">{KOFI_NAME}</h1>
+          <h1 className="text-page-title font-semibold">{ATLAS_NAME}</h1>
           <p className="truncate text-meta text-muted-foreground">
             Your business copilot — reads your live numbers, no setup needed
           </p>
@@ -27,10 +27,10 @@ export default async function InsightsPage() {
         </Badge>
       </div>
 
-      <KofiChat snapshot={snapshot} showCosts={owner} profile={profile} />
+      <AtlasChat snapshot={snapshot} showCosts={owner} profile={profile} />
 
       <p className="mt-2 text-center text-caption text-muted-foreground">
-        {KOFI_NAME} answers from rules over your live data today. Full AI-powered analysis is coming
+        {ATLAS_NAME} answers from rules over your live data today. Full AI-powered analysis is coming
         soon.
       </p>
     </div>

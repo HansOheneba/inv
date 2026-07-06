@@ -57,7 +57,7 @@ export function AppSidebar({
     { href: "/inventory", label: "Inventory", icon: Package },
     { href: "/sales", label: "Sales", icon: Receipt },
     { href: "/shipments", label: "Shipments", icon: Ship },
-    { href: "/insights", label: "Kofi", icon: Sparkles },
+    { href: "/insights", label: "Atlas", icon: Sparkles },
     ...(showEmployees ? [{ href: "/employees", label: "Team", icon: Users }] : []),
   ];
 
@@ -68,9 +68,9 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link href="/" />}>
               <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                <Package className="size-4" />
+                <span className="text-[13px] font-semibold">RK</span>
               </div>
-              <span className="text-row-title font-medium">Stockline</span>
+              <span className="text-row-title font-medium">Raj Kollections</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

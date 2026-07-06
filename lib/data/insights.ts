@@ -21,7 +21,7 @@ export interface BusinessSnapshot {
 
 /**
  * Pulls together a snapshot of live business data. This is the "context"
- * that would be handed to a real RAG pipeline later — for now Kofi's demo
+ * that would be handed to a real RAG pipeline later — for now Atlas's demo
  * answers are generated from this object with simple rules instead of an
  * LLM call.
  */

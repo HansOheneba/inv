@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  answerKofi,
+  answerAtlas,
   buildOpeningInsights,
   randomThinkingDelay,
   suggestedPrompts,
-  KOFI_NAME,
-} from "@/lib/insights/kofi";
+  ATLAS_NAME,
+} from "@/lib/insights/atlas";
 import { cn } from "@/lib/utils";
 import type { BusinessSnapshot } from "@/lib/data/insights";
 import type { CurrentProfile } from "@/lib/auth";
@@ -33,7 +33,7 @@ function initials(name: string, email: string | null) {
     .toUpperCase();
 }
 
-export function KofiChat({
+export function AtlasChat({
   snapshot,
   showCosts,
   profile,
@@ -67,7 +67,7 @@ export function KofiChat({
     setThinking(true);
 
     setTimeout(() => {
-      const reply = answerKofi(question, snapshot, showCosts);
+      const reply = answerAtlas(question, snapshot, showCosts);
       setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "assistant", content: reply }]);
       setThinking(false);
     }, randomThinkingDelay());
@@ -156,7 +156,7 @@ export function KofiChat({
           <Input
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder={`Ask ${KOFI_NAME} about your business…`}
+            placeholder={`Ask ${ATLAS_NAME} about your business…`}
             className="h-9"
             disabled={thinking}
           />

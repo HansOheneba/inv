@@ -3,7 +3,9 @@ import { requireSupabaseContext } from "@/lib/supabase/context";
 export interface DashboardStats {
   stockValue: number;
   todaySales: number;
+  todayOrders: number;
   weekSales: number;
+  weekOrders: number;
   pendingShipments: number;
   lowStockCount: number;
   outOfStockCount: number;
@@ -48,6 +50,9 @@ export async function getDashboardStats(options?: { includeStockValue?: boolean 
     supabase.from("shipments").select("id").not("status", "in", "(received,cancelled)"),
   ]);
 
+  const salesToday = salesTodayRes.data ?? [];
+  const salesWeek = salesWeekRes.data ?? [];
+
   const overview = overviewRes.data ?? [];
   const lowStockCount = overview.filter(
     (row) => row.total_stock > 0 && row.total_stock <= row.reorder_point,
@@ -59,13 +64,79 @@ export async function getDashboardStats(options?: { includeStockValue?: boolean 
 
   return {
     stockValue,
-    todaySales: (salesTodayRes.data ?? []).reduce((sum, row) => sum + Number(row.total_amount), 0),
-    weekSales: (salesWeekRes.data ?? []).reduce((sum, row) => sum + Number(row.total_amount), 0),
+    todaySales: salesToday.reduce((sum, row) => sum + Number(row.total_amount), 0),
+    todayOrders: salesToday.length,
+    weekSales: salesWeek.reduce((sum, row) => sum + Number(row.total_amount), 0),
+    weekOrders: salesWeek.length,
     pendingShipments: shipmentsRes.data?.length ?? 0,
     lowStockCount,
     outOfStockCount,
     totalProducts: overview.length,
   };
+}
+
+export interface RevenueTrendPoint {
+  label: string;
+  value: number;
+}
+
+/** Daily completed-sales revenue for the last 7 days, oldest first — powers the dashboard bar chart. */
+export async function getWeeklyRevenueTrend(): Promise<RevenueTrendPoint[]> {
+  const { supabase } = await requireSupabaseContext();
+
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - 6);
+
+  const { data } = await supabase
+    .from("sales")
+    .select("total_amount, created_at")
+    .eq("status", "completed")
+    .gte("created_at", start.toISOString());
+
+  const days: RevenueTrendPoint[] = [];
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(start);
+    day.setDate(start.getDate() + i);
+    const label = day.toLocaleDateString(undefined, { weekday: "short" });
+    const total = (data ?? [])
+      .filter((row) => new Date(row.created_at).toDateString() === day.toDateString())
+      .reduce((sum, row) => sum + Number(row.total_amount), 0);
+    days.push({ label, value: total });
+  }
+  return days;
+}
+
+export interface ChannelSplit {
+  inStorePct: number;
+  onlinePct: number;
+  hasData: boolean;
+}
+
+/** Splits all-time completed revenue between the physical store and every online channel. */
+export async function getChannelSplit(): Promise<ChannelSplit> {
+  const { supabase } = await requireSupabaseContext();
+
+  const { data } = await supabase
+    .from("sales")
+    .select("total_amount, channel:channel_id(type)")
+    .eq("status", "completed")
+    .returns<{ total_amount: number; channel: { type: string } | null }[]>();
+
+  const rows = data ?? [];
+  let inStore = 0;
+  let online = 0;
+  for (const row of rows) {
+    const channel = Array.isArray(row.channel) ? row.channel[0] : row.channel;
+    if (channel?.type === "physical_store") inStore += Number(row.total_amount);
+    else online += Number(row.total_amount);
+  }
+
+  const total = inStore + online;
+  if (total <= 0) return { inStorePct: 0, onlinePct: 0, hasData: false };
+
+  const inStorePct = Math.round((inStore / total) * 100);
+  return { inStorePct, onlinePct: 100 - inStorePct, hasData: true };
 }
 
 export async function getRecentActivity(limit = 8): Promise<ActivityItem[]> {

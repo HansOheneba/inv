@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { Package } from "lucide-react";
 import { getOptionalProfile } from "@/lib/auth";
 import { signInAction } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -30,9 +29,9 @@ export default async function LoginPage({
     <div className="w-full max-w-sm">
       <div className="mb-6 flex flex-col items-center gap-2 text-center">
         <div className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-          <Package className="size-5" />
+          <span className="text-[15px] font-semibold">RK</span>
         </div>
-        <h1 className="text-page-title font-semibold">Stockline</h1>
+        <h1 className="text-page-title font-semibold">Raj Kollections</h1>
         <p className="text-meta text-muted-foreground">
           Sign in to manage inventory, sales, and shipments
         </p>

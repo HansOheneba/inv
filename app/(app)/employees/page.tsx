@@ -29,7 +29,7 @@ export default async function EmployeesPage() {
       <div className="mb-4">
         <h1 className="text-page-title font-semibold">Team</h1>
         <p className="text-meta text-muted-foreground">
-          {employees.length} people with access to Stockline
+          {employees.length} people with access to Raj Kollections
         </p>
       </div>
 
