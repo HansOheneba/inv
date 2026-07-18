@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -29,28 +29,48 @@ import type { ShipmentFormOptions } from "@/lib/data/shipments";
 
 interface ItemRow {
   key: string;
-  productId: string;
+  variantId: string;
   quantity: string;
   unitCost: string;
 }
 
-function newRow(defaultProductId: string): ItemRow {
-  return { key: crypto.randomUUID(), productId: defaultProductId, quantity: "1", unitCost: "0" };
+function newRow(variants: ShipmentFormOptions["variants"]): ItemRow {
+  const first = variants[0];
+  return {
+    key: crypto.randomUUID(),
+    variantId: first?.variantId ?? "",
+    quantity: "1",
+    unitCost: String(first?.defaultCost ?? 0),
+  };
 }
 
 export function NewShipmentDialog({ options }: { options: ShipmentFormOptions }) {
   const [open, setOpen] = useState(false);
-  const [items, setItems] = useState<ItemRow[]>(() => [newRow(options.products[0]?.id ?? "")]);
+  const [items, setItems] = useState<ItemRow[]>(() => [newRow(options.variants)]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const variantById = useMemo(
+    () => new Map(options.variants.map((v) => [v.variantId, v])),
+    [options.variants],
+  );
+  const variantLabels = useMemo(
+    () => Object.fromEntries(options.variants.map((v) => [v.variantId, v.label])),
+    [options.variants],
+  );
 
   function updateItem(key: string, patch: Partial<ItemRow>) {
     setItems((rows) => rows.map((row) => (row.key === key ? { ...row, ...patch } : row)));
   }
 
+  function selectVariant(key: string, variantId: string) {
+    const variant = variantById.get(variantId);
+    updateItem(key, { variantId, unitCost: variant ? String(variant.defaultCost) : "0" });
+  }
+
   function addItem() {
-    setItems((rows) => [...rows, newRow(options.products[0]?.id ?? "")]);
+    setItems((rows) => [...rows, newRow(options.variants)]);
   }
 
   function removeItem(key: string) {
@@ -67,7 +87,8 @@ export function NewShipmentDialog({ options }: { options: ShipmentFormOptions })
       "itemsJson",
       JSON.stringify(
         items.map((row) => ({
-          productId: row.productId,
+          productId: variantById.get(row.variantId)?.productId ?? "",
+          variantId: row.variantId,
           quantity: Number(row.quantity),
           unitCost: Number(row.unitCost) || 0,
         })),
@@ -82,7 +103,7 @@ export function NewShipmentDialog({ options }: { options: ShipmentFormOptions })
     }
     toast.success("Shipment logged");
     setOpen(false);
-    setItems([newRow(options.products[0]?.id ?? "")]);
+    setItems([newRow(options.variants)]);
     router.refresh();
   }
 
@@ -163,16 +184,17 @@ export function NewShipmentDialog({ options }: { options: ShipmentFormOptions })
                 {items.map((row) => (
                   <div key={row.key} className="flex items-center gap-2">
                     <Select
-                      value={row.productId}
-                      onValueChange={(value) => updateItem(row.key, { productId: value ?? "" })}
+                      items={variantLabels}
+                      value={row.variantId}
+                      onValueChange={(value) => selectVariant(row.key, String(value ?? ""))}
                     >
                       <SelectTrigger className="w-full flex-1">
                         <SelectValue placeholder="Product" />
                       </SelectTrigger>
                       <SelectContent>
-                        {options.products.map((product) => (
-                          <SelectItem key={product.id} value={product.id}>
-                            {product.name}
+                        {options.variants.map((variant) => (
+                          <SelectItem key={variant.variantId} value={variant.variantId}>
+                            {variant.label}
                           </SelectItem>
                         ))}
                       </SelectContent>

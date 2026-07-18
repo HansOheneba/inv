@@ -22,14 +22,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
+import { cn } from "@/lib/utils";
 import type { SaleFormOptions } from "@/lib/data/sales";
 
 export function RecordSaleDialog({ options }: { options: SaleFormOptions }) {
   const [open, setOpen] = useState(false);
-  const [productId, setProductId] = useState(options.products[0]?.id ?? "");
-  const [unitPrice, setUnitPrice] = useState(String(options.products[0]?.salePrice ?? 0));
+  const [variantId, setVariantId] = useState(options.variants[0]?.variantId ?? "");
+  const [unitPrice, setUnitPrice] = useState(String(options.variants[0]?.salePrice ?? 0));
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const variantLabels = Object.fromEntries(options.variants.map((v) => [v.variantId, v.label]));
+  const productId = options.variants.find((v) => v.variantId === variantId)?.productId ?? "";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,26 +60,36 @@ export function RecordSaleDialog({ options }: { options: SaleFormOptions }) {
           <DialogTitle className="text-section-title">Record a sale</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} id="record-sale-form">
+          <input type="hidden" name="productId" value={productId} />
+          <input type="hidden" name="variantId" value={variantId} />
           <FieldGroup>
             {error ? <FieldError>{error}</FieldError> : null}
             <Field>
-              <FieldLabel htmlFor="productId">Product</FieldLabel>
+              <FieldLabel htmlFor="variantId">Product</FieldLabel>
               <Select
-                name="productId"
-                value={productId}
+                items={variantLabels}
+                value={variantId}
                 onValueChange={(value) => {
-                  setProductId(value ?? "");
-                  const product = options.products.find((p) => p.id === value);
-                  if (product) setUnitPrice(String(product.salePrice));
+                  setVariantId(String(value ?? ""));
+                  const variant = options.variants.find((v) => v.variantId === value);
+                  if (variant) setUnitPrice(String(variant.salePrice));
                 }}
               >
-                <SelectTrigger id="productId" className="w-full">
+                <SelectTrigger id="variantId" className="w-full">
                   <SelectValue placeholder="Choose a product" />
                 </SelectTrigger>
                 <SelectContent>
-                  {options.products.map((product) => (
-                    <SelectItem key={product.id} value={product.id}>
-                      {product.name}
+                  {options.variants.map((variant) => (
+                    <SelectItem key={variant.variantId} value={variant.variantId}>
+                      <span className="flex-1">{variant.label}</span>
+                      <span
+                        className={cn(
+                          "tabular-nums text-meta",
+                          variant.stock <= 0 ? "text-status-out" : "text-muted-foreground",
+                        )}
+                      >
+                        {variant.stock} left
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>

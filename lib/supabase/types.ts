@@ -8,6 +8,12 @@ export type ShipmentStatus = "ordered" | "in_transit" | "customs" | "received" |
 export type StockMovementType = "receive" | "transfer" | "sale" | "adjustment" | "return";
 export type SalesChannelType = "online" | "instagram" | "whatsapp" | "facebook" | "physical_store";
 export type SaleStatus = "completed" | "pending" | "refunded";
+export type OrderStatus =
+  | "confirmed"
+  | "packed"
+  | "out_for_delivery"
+  | "delivered"
+  | "cancelled";
 
 // supabase-js requires every table/view to carry a `Relationships` array to
 // satisfy its GenericTable/GenericView constraints. We don't model foreign
@@ -70,6 +76,7 @@ export interface Database {
           sku: string | null;
           barcode: string | null;
           category: string | null;
+          brand: string | null;
           unit: string;
           reorder_point: number;
           cost_price: number;
@@ -80,6 +87,26 @@ export interface Database {
         };
         Insert: Partial<Database["public"]["Tables"]["products"]["Row"]> & { name: string };
         Update: Partial<Database["public"]["Tables"]["products"]["Row"]>;
+      } & NoRelationships;
+      product_variants: {
+        Row: {
+          id: string;
+          product_id: string;
+          name: string;
+          sku: string | null;
+          barcode: string | null;
+          attributes: Record<string, string>;
+          cost_price: number;
+          sale_price: number;
+          reorder_point: number;
+          active: boolean;
+          is_default: boolean;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["product_variants"]["Row"]> & {
+          product_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["product_variants"]["Row"]>;
       } & NoRelationships;
       shipments: {
         Row: {
@@ -106,6 +133,7 @@ export interface Database {
           id: string;
           shipment_id: string;
           product_id: string;
+          variant_id: string;
           quantity: number;
           unit_cost: number;
           currency: string;
@@ -113,6 +141,7 @@ export interface Database {
         Insert: Partial<Database["public"]["Tables"]["shipment_items"]["Row"]> & {
           shipment_id: string;
           product_id: string;
+          variant_id: string;
           quantity: number;
         };
         Update: Partial<Database["public"]["Tables"]["shipment_items"]["Row"]>;
@@ -120,12 +149,14 @@ export interface Database {
       inventory_stock: {
         Row: {
           product_id: string;
+          variant_id: string;
           location_id: string;
           quantity: number;
           updated_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["inventory_stock"]["Row"]> & {
           product_id: string;
+          variant_id: string;
           location_id: string;
         };
         Update: Partial<Database["public"]["Tables"]["inventory_stock"]["Row"]>;
@@ -134,6 +165,7 @@ export interface Database {
         Row: {
           id: string;
           product_id: string;
+          variant_id: string;
           from_location_id: string | null;
           to_location_id: string | null;
           quantity: number;
@@ -146,6 +178,7 @@ export interface Database {
         };
         Insert: Partial<Database["public"]["Tables"]["stock_movements"]["Row"]> & {
           product_id: string;
+          variant_id: string;
           quantity: number;
           type: StockMovementType;
         };
@@ -172,6 +205,7 @@ export interface Database {
           id: string;
           sale_id: string;
           product_id: string;
+          variant_id: string;
           quantity: number;
           unit_price: number;
           unit_cost_snapshot: number;
@@ -179,9 +213,52 @@ export interface Database {
         Insert: Partial<Database["public"]["Tables"]["sale_items"]["Row"]> & {
           sale_id: string;
           product_id: string;
+          variant_id: string;
           quantity: number;
         };
         Update: Partial<Database["public"]["Tables"]["sale_items"]["Row"]>;
+      } & NoRelationships;
+      orders: {
+        Row: {
+          id: string;
+          order_number: number;
+          customer_name: string;
+          customer_phone: string | null;
+          delivery_address: string | null;
+          maps_url: string | null;
+          status: OrderStatus;
+          notes: string | null;
+          discount: number;
+          rider_name: string | null;
+          rider_phone: string | null;
+          packed_at: string | null;
+          dispatched_at: string | null;
+          delivered_at: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["orders"]["Row"]> & {
+          customer_name: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["orders"]["Row"]>;
+      } & NoRelationships;
+      order_items: {
+        Row: {
+          id: string;
+          order_id: string;
+          product_id: string;
+          variant_id: string;
+          quantity: number;
+          unit_price: number;
+          spec_note: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["order_items"]["Row"]> & {
+          order_id: string;
+          product_id: string;
+          variant_id: string;
+          quantity: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["order_items"]["Row"]>;
       } & NoRelationships;
       activity_log: {
         Row: {
@@ -200,6 +277,34 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["activity_log"]["Row"]>;
       } & NoRelationships;
+      atlas_conversations: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["atlas_conversations"]["Row"]> & {
+          user_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["atlas_conversations"]["Row"]>;
+      } & NoRelationships;
+      atlas_messages: {
+        Row: {
+          id: string;
+          conversation_id: string;
+          role: "user" | "assistant";
+          content: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["atlas_messages"]["Row"]> & {
+          conversation_id: string;
+          role: "user" | "assistant";
+          content: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["atlas_messages"]["Row"]>;
+      } & NoRelationships;
     };
     Views: {
       product_stock_overview: {
@@ -217,6 +322,28 @@ export interface Database {
           total_stock: number;
           primary_location: string | null;
           location_count: number;
+          variant_count: number;
+          brand: string | null;
+        };
+      } & NoRelationships;
+      variant_stock_overview: {
+        Row: {
+          variant_id: string;
+          product_id: string;
+          product_name: string;
+          variant_name: string;
+          attributes: Record<string, string>;
+          sku: string | null;
+          barcode: string | null;
+          is_default: boolean;
+          active: boolean;
+          category: string | null;
+          unit: string;
+          reorder_point: number;
+          cost_price: number;
+          sale_price: number;
+          total_stock: number;
+          primary_location: string | null;
         };
       } & NoRelationships;
     };

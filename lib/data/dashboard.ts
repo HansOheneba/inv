@@ -75,6 +75,65 @@ export async function getDashboardStats(options?: { includeStockValue?: boolean 
   };
 }
 
+export interface OrderPipeline {
+  confirmed: number;
+  packed: number;
+  outForDelivery: number;
+  openTotal: number;
+  deliveredToday: number;
+  deliveredWeek: number;
+  /** Average hours from an order being locked in to it being delivered, over the last 7 days. */
+  avgFulfilmentHours: number | null;
+}
+
+/**
+ * Snapshot of the WhatsApp-order fulfilment pipeline for the dashboard: how
+ * many orders sit at each open stage, plus delivery throughput and speed.
+ */
+export async function getOrderPipeline(): Promise<OrderPipeline> {
+  const { supabase } = await requireSupabaseContext();
+
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const startOfWeek = new Date(startOfToday);
+  startOfWeek.setDate(startOfWeek.getDate() - 6);
+
+  const [openRes, deliveredRes] = await Promise.all([
+    supabase.from("orders").select("status").in("status", ["confirmed", "packed", "out_for_delivery"]),
+    supabase
+      .from("orders")
+      .select("created_at, delivered_at")
+      .eq("status", "delivered")
+      .gte("delivered_at", startOfWeek.toISOString()),
+  ]);
+
+  const open = openRes.data ?? [];
+  const delivered = deliveredRes.data ?? [];
+
+  const durations = delivered
+    .filter((row) => row.delivered_at)
+    .map(
+      (row) =>
+        (new Date(row.delivered_at as string).getTime() - new Date(row.created_at).getTime()) /
+        3_600_000,
+    )
+    .filter((hours) => hours >= 0);
+
+  return {
+    confirmed: open.filter((row) => row.status === "confirmed").length,
+    packed: open.filter((row) => row.status === "packed").length,
+    outForDelivery: open.filter((row) => row.status === "out_for_delivery").length,
+    openTotal: open.length,
+    deliveredToday: delivered.filter(
+      (row) => row.delivered_at && new Date(row.delivered_at) >= startOfToday,
+    ).length,
+    deliveredWeek: delivered.length,
+    avgFulfilmentHours: durations.length
+      ? durations.reduce((sum, hours) => sum + hours, 0) / durations.length
+      : null,
+  };
+}
+
 export interface RevenueTrendPoint {
   label: string;
   value: number;

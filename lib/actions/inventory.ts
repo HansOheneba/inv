@@ -26,11 +26,12 @@ export async function adjustStockAction(
 ): Promise<AdjustStockResult> {
   const profile = await getCurrentProfile();
   const productId = String(formData.get("productId") ?? "");
+  const variantId = String(formData.get("variantId") ?? "");
   const locationId = String(formData.get("locationId") ?? "");
   const delta = Number(formData.get("delta"));
   const note = String(formData.get("note") ?? "").trim() || null;
 
-  if (!productId || !locationId) return { error: "Missing product or location" };
+  if (!productId || !variantId || !locationId) return { error: "Missing variant or location" };
   if (!Number.isFinite(delta) || delta === 0) return { error: "Enter a non-zero quantity" };
 
   const { supabase } = await requireSupabaseContext();
@@ -38,7 +39,7 @@ export async function adjustStockAction(
   const { data: existing } = await supabase
     .from("inventory_stock")
     .select("quantity")
-    .eq("product_id", productId)
+    .eq("variant_id", variantId)
     .eq("location_id", locationId)
     .maybeSingle();
 
@@ -47,14 +48,21 @@ export async function adjustStockAction(
   const { error: upsertError } = await supabase
     .from("inventory_stock")
     .upsert(
-      { product_id: productId, location_id: locationId, quantity: nextQuantity, updated_at: new Date().toISOString() },
-      { onConflict: "product_id,location_id" },
+      {
+        product_id: productId,
+        variant_id: variantId,
+        location_id: locationId,
+        quantity: nextQuantity,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "variant_id,location_id" },
     );
 
   if (upsertError) return { error: upsertError.message };
 
   const { error: movementError } = await supabase.from("stock_movements").insert({
     product_id: productId,
+    variant_id: variantId,
     from_location_id: delta < 0 ? locationId : null,
     to_location_id: delta > 0 ? locationId : null,
     quantity: Math.abs(delta),
@@ -71,92 +79,6 @@ export async function adjustStockAction(
     entity_type: "product",
     entity_id: productId,
     description: `${delta > 0 ? "Added" : "Removed"} ${Math.abs(delta)} unit(s)${note ? ` — ${note}` : ""}`,
-  });
-
-  revalidatePath("/inventory");
-  revalidatePath("/");
-
-  return { success: true };
-}
-
-export interface TransferStockResult {
-  error?: string;
-  success?: boolean;
-}
-
-export async function transferStockAction(
-  _prev: TransferStockResult,
-  formData: FormData,
-): Promise<TransferStockResult> {
-  const profile = await getCurrentProfile();
-  const productId = String(formData.get("productId") ?? "");
-  const fromLocationId = String(formData.get("fromLocationId") ?? "");
-  const toLocationId = String(formData.get("toLocationId") ?? "");
-  const quantity = Number(formData.get("quantity"));
-
-  if (!productId || !fromLocationId || !toLocationId) {
-    return { error: "Missing product or locations" };
-  }
-  if (fromLocationId === toLocationId) return { error: "Pick two different locations" };
-  if (!Number.isFinite(quantity) || quantity <= 0) return { error: "Enter a quantity to move" };
-
-  const { supabase } = await requireSupabaseContext();
-
-  const { data: source } = await supabase
-    .from("inventory_stock")
-    .select("quantity")
-    .eq("product_id", productId)
-    .eq("location_id", fromLocationId)
-    .maybeSingle();
-
-  if (!source || source.quantity < quantity) {
-    return { error: "Not enough stock at the source location" };
-  }
-
-  const { data: destination } = await supabase
-    .from("inventory_stock")
-    .select("quantity")
-    .eq("product_id", productId)
-    .eq("location_id", toLocationId)
-    .maybeSingle();
-
-  const { error: fromError } = await supabase
-    .from("inventory_stock")
-    .update({ quantity: source.quantity - quantity, updated_at: new Date().toISOString() })
-    .eq("product_id", productId)
-    .eq("location_id", fromLocationId);
-
-  if (fromError) return { error: fromError.message };
-
-  const { error: toError } = await supabase
-    .from("inventory_stock")
-    .upsert(
-      {
-        product_id: productId,
-        location_id: toLocationId,
-        quantity: (destination?.quantity ?? 0) + quantity,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "product_id,location_id" },
-    );
-
-  if (toError) return { error: toError.message };
-
-  await supabase.from("stock_movements").insert({
-    product_id: productId,
-    from_location_id: fromLocationId,
-    to_location_id: toLocationId,
-    quantity,
-    type: "transfer",
-    created_by: profile.id,
-  });
-
-  await supabase.from("activity_log").insert({
-    user_id: profile.id,
-    action_type: "stock.transfer",
-    entity_type: "product",
-    entity_id: productId,
-    description: `Transferred ${quantity} unit(s) between locations`,
   });
 
   revalidatePath("/inventory");

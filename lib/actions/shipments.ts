@@ -17,6 +17,7 @@ export interface CreateShipmentResult {
 
 interface ShipmentItemInput {
   productId: string;
+  variantId: string;
   quantity: number;
   unitCost: number;
 }
@@ -51,7 +52,7 @@ export async function createShipmentAction(
     return { error: "Could not read the item list" };
   }
   items = items.filter(
-    (item) => item.productId && Number.isFinite(item.quantity) && item.quantity > 0,
+    (item) => item.productId && item.variantId && Number.isFinite(item.quantity) && item.quantity > 0,
   );
   if (items.length === 0) return { error: "Add at least one product line" };
 
@@ -82,6 +83,7 @@ export async function createShipmentAction(
     items.map((item) => ({
       shipment_id: shipment.id,
       product_id: item.productId,
+      variant_id: item.variantId,
       quantity: item.quantity,
       unit_cost: item.unitCost || 0,
       currency,
@@ -139,29 +141,31 @@ export async function advanceShipmentAction(formData: FormData): Promise<Receive
 
     const { data: items } = await supabase
       .from("shipment_items")
-      .select("product_id, quantity")
+      .select("product_id, variant_id, quantity")
       .eq("shipment_id", shipmentId);
 
     for (const item of items ?? []) {
       const { data: existing } = await supabase
         .from("inventory_stock")
         .select("quantity")
-        .eq("product_id", item.product_id)
+        .eq("variant_id", item.variant_id)
         .eq("location_id", locationId)
         .maybeSingle();
 
       await supabase.from("inventory_stock").upsert(
         {
           product_id: item.product_id,
+          variant_id: item.variant_id,
           location_id: locationId,
           quantity: (existing?.quantity ?? 0) + item.quantity,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: "product_id,location_id" },
+        { onConflict: "variant_id,location_id" },
       );
 
       await supabase.from("stock_movements").insert({
         product_id: item.product_id,
+        variant_id: item.variant_id,
         to_location_id: locationId,
         quantity: item.quantity,
         type: "receive",

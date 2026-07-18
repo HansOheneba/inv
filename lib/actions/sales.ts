@@ -16,12 +16,13 @@ export async function recordSaleAction(
   const profile = await getCurrentProfile();
   const channelId = String(formData.get("channelId") ?? "") || null;
   const locationId = String(formData.get("locationId") ?? "");
+  const variantId = String(formData.get("variantId") ?? "");
   const productId = String(formData.get("productId") ?? "");
   const quantity = Number(formData.get("quantity"));
   const unitPrice = Number(formData.get("unitPrice"));
   const customerName = String(formData.get("customerName") ?? "").trim() || null;
 
-  if (!locationId || !productId) return { error: "Choose a location and product" };
+  if (!locationId || !variantId || !productId) return { error: "Choose a location and product" };
   if (!Number.isFinite(quantity) || quantity <= 0) return { error: "Enter a valid quantity" };
   if (!Number.isFinite(unitPrice) || unitPrice < 0) return { error: "Enter a valid price" };
 
@@ -30,7 +31,7 @@ export async function recordSaleAction(
   const { data: stock } = await supabase
     .from("inventory_stock")
     .select("quantity")
-    .eq("product_id", productId)
+    .eq("variant_id", variantId)
     .eq("location_id", locationId)
     .maybeSingle();
 
@@ -38,11 +39,13 @@ export async function recordSaleAction(
     return { error: "Not enough stock at that location" };
   }
 
-  const { data: product } = await supabase
-    .from("products")
-    .select("cost_price, name")
-    .eq("id", productId)
-    .single();
+  const [{ data: variant }, { data: product }] = await Promise.all([
+    supabase.from("product_variants").select("cost_price, name, is_default").eq("id", variantId).single(),
+    supabase.from("products").select("name").eq("id", productId).single(),
+  ]);
+
+  const productName = product?.name ?? "item";
+  const label = variant && !variant.is_default ? `${productName} (${variant.name})` : productName;
 
   const { data: sale, error: saleError } = await supabase
     .from("sales")
@@ -62,9 +65,10 @@ export async function recordSaleAction(
   const { error: itemError } = await supabase.from("sale_items").insert({
     sale_id: sale.id,
     product_id: productId,
+    variant_id: variantId,
     quantity,
     unit_price: unitPrice,
-    unit_cost_snapshot: product?.cost_price ?? 0,
+    unit_cost_snapshot: variant?.cost_price ?? 0,
   });
 
   if (itemError) return { error: itemError.message };
@@ -72,11 +76,12 @@ export async function recordSaleAction(
   await supabase
     .from("inventory_stock")
     .update({ quantity: stock.quantity - quantity, updated_at: new Date().toISOString() })
-    .eq("product_id", productId)
+    .eq("variant_id", variantId)
     .eq("location_id", locationId);
 
   await supabase.from("stock_movements").insert({
     product_id: productId,
+    variant_id: variantId,
     from_location_id: locationId,
     quantity,
     type: "sale",
@@ -90,7 +95,7 @@ export async function recordSaleAction(
     action_type: "sale.create",
     entity_type: "sale",
     entity_id: sale.id,
-    description: `Sold ${quantity} × ${product?.name ?? "item"}`,
+    description: `Sold ${quantity} × ${label}`,
   });
 
   revalidatePath("/sales");

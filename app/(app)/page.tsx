@@ -4,6 +4,7 @@ import { getCurrentProfile, isOwner } from "@/lib/auth";
 import {
   getChannelSplit,
   getDashboardStats,
+  getOrderPipeline,
   getPendingShipments,
   getRecentActivity,
   getWeeklyRevenueTrend,
@@ -12,6 +13,7 @@ import { getProductPerformance } from "@/lib/data/product-performance";
 import { Card, CardContent } from "@/components/ui/card";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { ChannelSplitCard } from "@/components/dashboard/channel-split-card";
+import { OrderPipelineCard } from "@/components/dashboard/order-pipeline-card";
 import { RevenueChartCard } from "@/components/dashboard/revenue-chart-card";
 import { AtlasPromoCard } from "@/components/dashboard/atlas-promo-card";
 import { ProductPerformanceTable } from "@/components/dashboard/product-performance-table";
@@ -26,13 +28,14 @@ export default async function DashboardPage() {
   const profile = await getCurrentProfile();
   const owner = isOwner(profile);
 
-  const [stats, trend, split, performance, activity, pendingShipments] = await Promise.all([
+  const [stats, trend, split, performance, activity, pendingShipments, pipeline] = await Promise.all([
     getDashboardStats({ includeStockValue: owner }),
     getWeeklyRevenueTrend(),
     getChannelSplit(),
     getProductPerformance({ includeCosts: owner }),
     getRecentActivity(),
     getPendingShipments(),
+    getOrderPipeline(),
   ]);
 
   const firstName = profile.full_name?.split(" ")[0] || "there";
@@ -65,6 +68,8 @@ export default async function DashboardPage() {
         />
         <ChannelSplitCard split={split} />
       </div>
+
+      <OrderPipelineCard pipeline={pipeline} />
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         <RevenueChartCard trend={trend} weekOrders={stats.weekOrders} weekRevenue={stats.weekSales} />

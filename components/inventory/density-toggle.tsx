@@ -2,11 +2,24 @@
 
 import { useState } from "react";
 import { AlignJustify, Rows3 } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { DENSITY_COOKIE, parseDensity, type Density } from "@/lib/density";
+
+const DENSITY_ICON: Record<Density, React.ComponentType<{ className?: string }>> = {
+  compact: Rows3,
+  comfortable: AlignJustify,
+};
 
 export function DensityToggle({ initial }: { initial: Density }) {
   const [density, setDensity] = useState<Density>(initial);
+  const Icon = DENSITY_ICON[density];
 
   function apply(next: string) {
     const value = parseDensity(next);
@@ -16,25 +29,26 @@ export function DensityToggle({ initial }: { initial: Density }) {
   }
 
   return (
-    <ToggleGroup
-      value={[density]}
-      onValueChange={(value) => value[0] && apply(value[0])}
-      variant="outline"
-      size="sm"
-      aria-label="Density mode"
-    >
-      <ToggleGroupItem value="compact" aria-label="Compact density" className="gap-1.5 px-2.5">
-        <Rows3 className="size-3.5" />
-        <span className="text-meta">Compact</span>
-      </ToggleGroupItem>
-      <ToggleGroupItem
-        value="comfortable"
-        aria-label="Comfortable density"
-        className="gap-1.5 px-2.5"
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="outline" size="icon" className="size-8" aria-label="Row density" />
+        }
       >
-        <AlignJustify className="size-3.5" />
-        <span className="text-meta">Comfortable</span>
-      </ToggleGroupItem>
-    </ToggleGroup>
+        <Icon className="size-4" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-36">
+        <DropdownMenuRadioGroup value={density} onValueChange={apply}>
+          <DropdownMenuRadioItem value="compact">
+            <Rows3 className="size-3.5" />
+            Compact
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="comfortable">
+            <AlignJustify className="size-3.5" />
+            Comfortable
+          </DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

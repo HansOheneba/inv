@@ -23,9 +23,11 @@ npm install
 
 Create a free project at [supabase.com](https://supabase.com/dashboard), then:
 
-1. Open the **SQL Editor** and run `supabase/migrations/0001_init.sql`, followed by
-   `supabase/seed.sql`. This creates every table, the `product_stock_overview` view, RLS
-   policies, and a handful of sample products/shipments/locations so the app isn't empty.
+1. Open the **SQL Editor** and run the migrations in order — `supabase/migrations/0001_init.sql`,
+   `0002_orders.sql`, `0003_variants.sql`, `0004_atlas_chats.sql`, `0005_product_brand.sql`, then
+   `0006_single_warehouse.sql` — followed by `supabase/seed.sql`. This creates every table (products, per-variant stock, orders,
+   movements, Atlas chat history), the `product_stock_overview` / `variant_stock_overview` views,
+   RLS policies, and a handful of sample products/variants/shipments so the app isn't empty.
 2. Under **Authentication → Users**, create a login (email + password) for yourself. The
    **first** person who ever signs in automatically becomes the **owner** — everyone created
    after that starts as an **employee** (promote them from the Team screen).
@@ -46,9 +48,14 @@ Fill in:
 | `SUPABASE_PUBLISHABLE_KEY` | Same place — starts with `sb_publishable_` |
 | `SUPABASE_SECRET_KEY` | Same place — starts with `sb_secret_`. **Never commit this.** |
 | `SUPABASE_JWKS_URL` | `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Same as `SUPABASE_URL` — exposed to the browser for Realtime |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Same as `SUPABASE_PUBLISHABLE_KEY` — exposed to the browser for Realtime |
 
-None of these need a `NEXT_PUBLIC_` prefix — every Supabase call in this app happens on the
-server (Server Components / Server Actions), never in the browser.
+Almost every Supabase call happens on the server (Server Components / Server Actions). The two
+`NEXT_PUBLIC_` values are the only exception: the Orders board opens a browser Realtime socket to
+react to new orders instantly, which needs the URL + publishable key client-side. The socket still
+authenticates as the signed-in user via the session cookie, so RLS applies. The secret key and
+JWKS URL are **never** exposed to the browser.
 
 ### 4. Run it
 

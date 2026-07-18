@@ -22,24 +22,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
-import type { InventoryItem } from "@/lib/data/inventory";
+import { VariantPicker, useVariantSelection } from "@/components/inventory/variant-picker";
+import type { InventoryItem, VariantDetail } from "@/lib/data/inventory";
 import type { Tables } from "@/lib/supabase/types";
 
 export function AdjustStockDialog({
   item,
+  variants,
   locations,
   open,
   onOpenChange,
 }: {
   item: InventoryItem | null;
+  variants: VariantDetail[] | null;
   locations: Tables<"locations">[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { variantId, setVariantId, ready } = useVariantSelection(variants);
 
   if (!item) return null;
+
+  const singleLocation = locations.length <= 1;
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -64,23 +70,29 @@ export function AdjustStockDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} id="adjust-stock-form">
           <input type="hidden" name="productId" value={item.productId} />
+          <input type="hidden" name="variantId" value={variantId} />
           <FieldGroup>
             {error ? <FieldError>{error}</FieldError> : null}
-            <Field>
-              <FieldLabel htmlFor="locationId">Location</FieldLabel>
-              <Select name="locationId" defaultValue={locations[0]?.id} required>
-                <SelectTrigger id="locationId" className="w-full">
-                  <SelectValue placeholder="Choose a location" />
-                </SelectTrigger>
-                <SelectContent>
-                  {locations.map((location) => (
-                    <SelectItem key={location.id} value={location.id}>
-                      {location.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
+            <VariantPicker variants={variants} value={variantId} onValueChange={setVariantId} />
+            {singleLocation ? (
+              <input type="hidden" name="locationId" value={locations[0]?.id ?? ""} />
+            ) : (
+              <Field>
+                <FieldLabel htmlFor="locationId">Location</FieldLabel>
+                <Select name="locationId" defaultValue={locations[0]?.id} required>
+                  <SelectTrigger id="locationId" className="w-full">
+                    <SelectValue placeholder="Choose a location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locations.map((location) => (
+                      <SelectItem key={location.id} value={location.id}>
+                        {location.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+            )}
             <Field>
               <FieldLabel htmlFor="delta">Quantity change</FieldLabel>
               <Input
@@ -98,7 +110,7 @@ export function AdjustStockDialog({
           </FieldGroup>
         </form>
         <DialogFooter>
-          <Button type="submit" form="adjust-stock-form" disabled={pending} className="w-full">
+          <Button type="submit" form="adjust-stock-form" disabled={pending || !ready} className="w-full">
             {pending ? "Saving…" : "Save adjustment"}
           </Button>
         </DialogFooter>

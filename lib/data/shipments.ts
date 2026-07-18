@@ -1,5 +1,6 @@
 import { requireSupabaseContext } from "@/lib/supabase/context";
 import { getSuppliers } from "@/lib/data/suppliers";
+import { getVariantOptions } from "@/lib/data/variants";
 import type { ShipmentStatus } from "@/lib/supabase/types";
 
 export interface ShipmentListItem {
@@ -64,20 +65,30 @@ export async function getShipments(options?: { includeCosts?: boolean }): Promis
   });
 }
 
+export interface ShipmentVariantOption {
+  variantId: string;
+  productId: string;
+  label: string;
+  unit: string;
+  defaultCost: number;
+}
+
 export interface ShipmentFormOptions {
   suppliers: { id: string; name: string }[];
-  products: { id: string; name: string; unit: string }[];
+  variants: ShipmentVariantOption[];
 }
 
 export async function getShipmentFormOptions(): Promise<ShipmentFormOptions> {
-  const { supabase } = await requireSupabaseContext();
-  const [suppliers, { data: products }] = await Promise.all([
-    getSuppliers(),
-    supabase.from("products").select("id, name, unit").order("name"),
-  ]);
+  const [suppliers, variants] = await Promise.all([getSuppliers(), getVariantOptions()]);
 
   return {
     suppliers: suppliers.map((s) => ({ id: s.id, name: s.name })),
-    products: (products ?? []).map((p) => ({ id: p.id, name: p.name, unit: p.unit })),
+    variants: variants.map((v) => ({
+      variantId: v.variantId,
+      productId: v.productId,
+      label: v.label,
+      unit: v.unit,
+      defaultCost: v.costPrice,
+    })),
   };
 }

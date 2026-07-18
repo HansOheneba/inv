@@ -2,11 +2,6 @@ import type { BusinessSnapshot } from "@/lib/data/insights";
 
 export const ATLAS_NAME = "Atlas";
 
-/** Small randomized delay so the demo "typing" indicator feels natural. */
-export function randomThinkingDelay() {
-  return 500 + Math.random() * 500;
-}
-
 const currency = (value: number) =>
   new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(
     value,
@@ -76,65 +71,4 @@ export function suggestedPrompts(snapshot: BusinessSnapshot): string[] {
   }
   prompts.push("Where are most of my sales coming from?");
   return prompts.slice(0, 4);
-}
-
-/**
- * Very small keyword router standing in for a real model. It only ever
- * talks about numbers already in `snapshot`, so it can't hallucinate —
- * it just can't answer anything outside that scope yet either.
- */
-export function answerAtlas(question: string, snapshot: BusinessSnapshot, showCosts: boolean): string {
-  const q = question.toLowerCase();
-
-  if (/(out of stock|out\b|reorder|restock|low stock|running low)/.test(q)) {
-    if (snapshot.outOfStockItems.length === 0 && snapshot.lowStockItems.length === 0) {
-      return "Nothing needs attention right now — every product is above its reorder point.";
-    }
-    const parts: string[] = [];
-    if (snapshot.outOfStockItems.length > 0) {
-      parts.push(
-        `Out of stock: ${snapshot.outOfStockItems.map((i) => i.name).join(", ")}.`,
-      );
-    }
-    if (snapshot.lowStockItems.length > 0) {
-      parts.push(
-        `Running low: ${snapshot.lowStockItems
-          .map((i) => `${i.name} (${i.totalStock} ${i.unit} left, reorder at ${i.reorderPoint})`)
-          .join("; ")}.`,
-      );
-    }
-    return `${parts.join(" ")} I'd start a shipment for these on the Shipments tab.`;
-  }
-
-  if (/(sale|sold|revenue|today|this week|week)/.test(q)) {
-    return `Today: ${currency(snapshot.todaySales)}. Last 7 days: ${currency(snapshot.weekSales)}, across ${snapshot.recentSalesCount} completed orders.`;
-  }
-
-  if (/(shipment|transit|customs|incoming|import|arriving|eta)/.test(q)) {
-    if (snapshot.pendingShipments.length === 0) {
-      return "Nothing in the pipeline right now — every logged shipment has already been received.";
-    }
-    return snapshot.pendingShipments
-      .map(
-        (s) =>
-          `${s.referenceCode} from ${s.supplierName ?? "an unlisted supplier"} — ${s.status.replace("_", " ")}, ${eta(s.expectedArrival)}.`,
-      )
-      .join(" ");
-  }
-
-  if (/(channel|where|instagram|whatsapp|facebook|online|store)/.test(q)) {
-    if (!snapshot.topChannel) return "I don't have enough recent sales yet to tell where they're coming from.";
-    return `Most of your recent orders (${snapshot.topChannel.count} of the last ${snapshot.recentSalesCount}) came through ${snapshot.topChannel.name}.`;
-  }
-
-  if (/(worth|value|stock value)/.test(q)) {
-    if (!showCosts) return "Stock value is only visible to the business owner.";
-    return `Everything on the shelf right now is worth about ${currency(snapshot.stockValue)} at cost, across ${snapshot.totalProducts} products.`;
-  }
-
-  if (/(hello|hi|hey|sup|yo)\b/.test(q)) {
-    return `Hey! Ask me about stock levels, sales, or shipments — I'm working from your live numbers.`;
-  }
-
-  return "I can only talk about stock, sales, and shipments for now — the fuller assistant (with real reasoning over your whole history) is coming soon.";
 }

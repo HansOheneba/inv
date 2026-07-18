@@ -1,4 +1,5 @@
 import { requireSupabaseContext } from "@/lib/supabase/context";
+import { getVariantOptions, type VariantOption } from "@/lib/data/variants";
 
 export interface SaleRow {
   id: string;
@@ -55,20 +56,20 @@ export async function getSales(limit = 50): Promise<SaleRow[]> {
 export interface SaleFormOptions {
   channels: { id: string; name: string }[];
   locations: { id: string; name: string }[];
-  products: { id: string; name: string; salePrice: number }[];
+  variants: VariantOption[];
 }
 
 export async function getSaleFormOptions(): Promise<SaleFormOptions> {
   const { supabase } = await requireSupabaseContext();
-  const [{ data: channels }, { data: locations }, { data: products }] = await Promise.all([
+  const [{ data: channels }, { data: locations }, variants] = await Promise.all([
     supabase.from("sales_channels").select("id, name").order("name"),
     supabase.from("locations").select("id, name").order("name"),
-    supabase.from("products").select("id, name, sale_price").order("name"),
+    getVariantOptions(),
   ]);
 
   return {
     channels: channels ?? [],
     locations: locations ?? [],
-    products: (products ?? []).map((p) => ({ id: p.id, name: p.name, salePrice: Number(p.sale_price) })),
+    variants,
   };
 }

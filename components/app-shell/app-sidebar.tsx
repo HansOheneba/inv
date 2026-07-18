@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, Package, Receipt, Ship, Sparkles, User, Users } from "lucide-react";
+import { ClipboardList, LayoutDashboard, LogOut, Package, Receipt, Ship, Sparkles, User, Users } from "lucide-react";
 import { signOutAction } from "@/lib/actions/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -46,18 +46,21 @@ function initials(name: string, email: string | null) {
 export function AppSidebar({
   profile,
   showEmployees,
+  showAtlas,
 }: {
   profile: CurrentProfile;
   showEmployees: boolean;
+  showAtlas: boolean;
 }) {
   const pathname = usePathname();
 
   const items: NavItem[] = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/orders", label: "Orders", icon: ClipboardList },
     { href: "/inventory", label: "Inventory", icon: Package },
     { href: "/sales", label: "Sales", icon: Receipt },
     { href: "/shipments", label: "Shipments", icon: Ship },
-    { href: "/insights", label: "Atlas", icon: Sparkles },
+    ...(showAtlas ? [{ href: "/insights", label: "Atlas", icon: Sparkles }] : []),
     ...(showEmployees ? [{ href: "/employees", label: "Team", icon: Users }] : []),
   ];
 

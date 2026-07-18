@@ -1,38 +1,43 @@
-import { Sparkles } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { redirect } from "next/navigation";
 import { getCurrentProfile, isOwner } from "@/lib/auth";
 import { getBusinessSnapshot } from "@/lib/data/insights";
-import { AtlasChat } from "@/components/insights/atlas-chat";
-import { ATLAS_NAME } from "@/lib/insights/atlas";
+import { getConversations, getConversationMessages } from "@/lib/data/atlas";
+import { AtlasWorkspace } from "@/components/insights/atlas-workspace";
 
-export default async function InsightsPage() {
+export default async function InsightsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ c?: string }>;
+}) {
   const profile = await getCurrentProfile();
-  const owner = isOwner(profile);
-  const snapshot = await getBusinessSnapshot({ includeCosts: owner });
+  // Atlas reasons over cost/margin data across the whole business, so it's the
+  // owner's tool only — employees are sent back to the dashboard.
+  if (!isOwner(profile)) redirect("/");
+
+  const [{ c: requested }, conversations, snapshot] = await Promise.all([
+    searchParams,
+    getConversations(),
+    getBusinessSnapshot({ includeCosts: true }),
+  ]);
+
+  // `c=new` forces a blank thread; otherwise resume the requested (owned) thread,
+  // falling back to the most recent one.
+  const isNew = requested === "new";
+  const activeId = isNew
+    ? null
+    : requested && conversations.some((conversation) => conversation.id === requested)
+      ? requested
+      : (conversations[0]?.id ?? null);
+
+  const initialMessages = activeId ? await getConversationMessages(activeId) : [];
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-3rem)] max-w-3xl flex-col px-6 py-6">
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-          <Sparkles className="size-4" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <h1 className="text-page-title font-semibold">{ATLAS_NAME}</h1>
-          <p className="truncate text-meta text-muted-foreground">
-            Your business copilot — reads your live numbers, no setup needed
-          </p>
-        </div>
-        <Badge variant="secondary" className="shrink-0 gap-1 text-[11px]">
-          Demo
-        </Badge>
-      </div>
-
-      <AtlasChat snapshot={snapshot} showCosts={owner} profile={profile} />
-
-      <p className="mt-2 text-center text-caption text-muted-foreground">
-        {ATLAS_NAME} answers from rules over your live data today. Full AI-powered analysis is coming
-        soon.
-      </p>
-    </div>
+    <AtlasWorkspace
+      conversations={conversations}
+      activeId={activeId}
+      initialMessages={initialMessages}
+      snapshot={snapshot}
+      profile={profile}
+    />
   );
 }

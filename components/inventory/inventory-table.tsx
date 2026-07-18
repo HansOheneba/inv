@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { ArrowDown, ArrowUp, ArrowUpDown, MoreVertical, PackageSearch, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,15 +21,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge } from "@/components/inventory/status-badge";
 import { AdjustStockDialog } from "@/components/inventory/adjust-stock-dialog";
-import { TransferStockDialog } from "@/components/inventory/transfer-stock-dialog";
 import { ProductDetailSheet } from "@/components/inventory/product-detail-sheet";
 import { getProductDetailAction } from "@/lib/actions/inventory";
 import { cn } from "@/lib/utils";
-import type { InventoryItem, ProductDetail } from "@/lib/data/inventory";
+import type { InventoryItem, ProductDetail, VariantDetail } from "@/lib/data/inventory";
 import type { Tables } from "@/lib/supabase/types";
 
-type QuickAction = "adjust" | "transfer";
-type SortField = "name" | "sku" | "category" | "location" | "stock" | "status" | "price";
+type QuickAction = "adjust";
+type SortField = "name" | "brand" | "sku" | "category" | "stock" | "status" | "price";
 type SortDir = "asc" | "desc";
 
 const currency = (value: number) =>
@@ -42,12 +42,12 @@ function compare(a: InventoryItem, b: InventoryItem, field: SortField): number {
   switch (field) {
     case "name":
       return a.name.localeCompare(b.name);
+    case "brand":
+      return (a.brand ?? "").localeCompare(b.brand ?? "");
     case "sku":
       return (a.sku ?? "").localeCompare(b.sku ?? "");
     case "category":
       return (a.category ?? "").localeCompare(b.category ?? "");
-    case "location":
-      return (a.primaryLocation ?? "").localeCompare(b.primaryLocation ?? "");
     case "stock":
       return a.totalStock - b.totalStock;
     case "status":
@@ -63,10 +63,12 @@ export function InventoryTable({
   items,
   locations,
   showCosts,
+  canEdit,
 }: {
   items: InventoryItem[];
   locations: Tables<"locations">[];
   showCosts: boolean;
+  canEdit: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<{ field: SortField; dir: SortDir }>({ field: "name", dir: "asc" });
@@ -77,6 +79,9 @@ export function InventoryTable({
   const [actionDialog, setActionDialog] = useState<{ type: QuickAction; item: InventoryItem } | null>(
     null,
   );
+  // Loaded lazily when a quick action opens, since the list view is product-level
+  // and doesn't carry each product's variants.
+  const [actionVariants, setActionVariants] = useState<VariantDetail[] | null>(null);
 
   function openDetail(product: InventoryItem) {
     setDetailItem(product);
@@ -85,6 +90,14 @@ export function InventoryTable({
     getProductDetailAction(product.productId).then((result) => {
       setDetail(result);
       setDetailLoading(false);
+    });
+  }
+
+  function openAction(type: QuickAction, item: InventoryItem) {
+    setActionDialog({ type, item });
+    setActionVariants(null);
+    getProductDetailAction(item.productId).then((result) => {
+      setActionVariants(result?.variants ?? []);
     });
   }
 
@@ -103,7 +116,8 @@ export function InventoryTable({
           (item) =>
             item.name.toLowerCase().includes(q) ||
             item.sku?.toLowerCase().includes(q) ||
-            item.category?.toLowerCase().includes(q),
+            item.category?.toLowerCase().includes(q) ||
+            item.brand?.toLowerCase().includes(q),
         )
       : items;
 
@@ -139,14 +153,14 @@ export function InventoryTable({
                 <SortableHead field="name" sort={sort} onSort={toggleSort}>
                   Name
                 </SortableHead>
+                <SortableHead field="brand" sort={sort} onSort={toggleSort}>
+                  Brand
+                </SortableHead>
                 <SortableHead field="sku" sort={sort} onSort={toggleSort}>
                   SKU
                 </SortableHead>
                 <SortableHead field="category" sort={sort} onSort={toggleSort}>
                   Category
-                </SortableHead>
-                <SortableHead field="location" sort={sort} onSort={toggleSort}>
-                  Location
                 </SortableHead>
                 <SortableHead field="stock" sort={sort} onSort={toggleSort} align="right">
                   Stock
@@ -176,21 +190,21 @@ export function InventoryTable({
                   <TableCell className="row-py">
                     <div className="flex items-center gap-2">
                       <span className="truncate text-row-title font-medium">{item.name}</span>
-                      {item.locationCount > 1 ? (
-                        <span className="shrink-0 text-meta text-muted-foreground">
-                          +{item.locationCount - 1}
+                      {item.variantCount > 1 ? (
+                        <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-meta text-muted-foreground">
+                          {item.variantCount} variants
                         </span>
                       ) : null}
                     </div>
+                  </TableCell>
+                  <TableCell className="row-py text-meta text-muted-foreground">
+                    {item.brand ?? "—"}
                   </TableCell>
                   <TableCell className="row-py text-meta text-muted-foreground">
                     {item.sku ?? "—"}
                   </TableCell>
                   <TableCell className="row-py text-meta text-muted-foreground">
                     {item.category ?? "—"}
-                  </TableCell>
-                  <TableCell className="row-py text-meta text-muted-foreground">
-                    {item.primaryLocation ?? "Unassigned"}
                   </TableCell>
                   <TableCell className="row-py text-right text-row-value font-semibold tabular-nums">
                     {item.totalStock}
@@ -227,11 +241,13 @@ export function InventoryTable({
                         <DropdownMenuItem onSelect={() => openDetail(item)}>
                           View details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setActionDialog({ type: "adjust", item })}>
+                        {canEdit ? (
+                          <DropdownMenuItem render={<Link href={`/inventory/${item.productId}/edit`} />}>
+                            Edit product
+                          </DropdownMenuItem>
+                        ) : null}
+                        <DropdownMenuItem onSelect={() => openAction("adjust", item)}>
                           Adjust stock
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setActionDialog({ type: "transfer", item })}>
-                          Transfer stock
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -250,17 +266,13 @@ export function InventoryTable({
         open={detailOpen}
         onOpenChange={setDetailOpen}
         showCosts={showCosts}
+        canEdit={canEdit}
       />
       <AdjustStockDialog
         item={actionDialog?.type === "adjust" ? actionDialog.item : null}
+        variants={actionVariants}
         locations={locations}
         open={actionDialog?.type === "adjust"}
-        onOpenChange={(open) => !open && setActionDialog(null)}
-      />
-      <TransferStockDialog
-        item={actionDialog?.type === "transfer" ? actionDialog.item : null}
-        locations={locations}
-        open={actionDialog?.type === "transfer"}
         onOpenChange={(open) => !open && setActionDialog(null)}
       />
     </div>
