@@ -19,22 +19,22 @@ export function RevenueChartCard({
   const avgOrder = weekOrders > 0 ? weekRevenue / weekOrders : 0;
 
   return (
-    <Card className="gap-3 py-4">
-      <CardContent className="px-4">
-        <div className="flex items-center justify-between">
+    <Card className="h-full gap-0 py-5">
+      <CardContent className="px-5">
+        <div className="flex items-center justify-between gap-3">
           <p className="text-section-title">Revenue</p>
           <span className="text-meta text-muted-foreground">Last 7 days</span>
         </div>
 
-        <div className="mt-4 flex gap-4">
-          <div className="flex h-36 flex-1 items-end gap-2">
+        <div className="mt-5 flex gap-6">
+          <div className="flex h-44 flex-1 items-end gap-2.5">
             {trend.map((day) => {
               const pct = Math.max(4, Math.round((day.value / max) * 100));
               return (
-                <div key={day.label} className="flex h-full flex-1 flex-col items-center justify-end gap-1.5">
+                <div key={day.label} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1.5">
                   <div className="flex w-full flex-1 items-end">
                     <div
-                      className="w-full rounded-md bg-primary/85"
+                      className="w-full rounded-md bg-linear-to-t from-accent-emerald to-accent-teal"
                       style={{ height: `${pct}%` }}
                       title={currency(day.value)}
                     />
@@ -45,10 +45,10 @@ export function RevenueChartCard({
             })}
           </div>
 
-          <div className="flex w-28 shrink-0 flex-col gap-2 sm:w-32">
-            <StatTile label="Orders" value={String(weekOrders)} />
-            <StatTile label="Avg order" value={currency(avgOrder)} />
-            <StatTile label="Revenue" value={currency(weekRevenue)} />
+          <div className="flex w-32 shrink-0 flex-col gap-2.5 sm:w-36">
+            <StatTile label="Orders" value={String(weekOrders)} accent="sky" />
+            <StatTile label="Avg order" value={currency(avgOrder)} accent="amber" />
+            <StatTile label="Revenue" value={currency(weekRevenue)} accent="emerald" />
           </div>
         </div>
       </CardContent>
@@ -56,9 +56,24 @@ export function RevenueChartCard({
   );
 }
 
-function StatTile({ label, value }: { label: string; value: string }) {
+function StatTile({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string;
+  accent: "sky" | "amber" | "emerald";
+}) {
+  const surface =
+    accent === "sky"
+      ? "border-accent-sky/20 bg-accent-sky-soft"
+      : accent === "amber"
+        ? "border-accent-amber/25 bg-accent-amber-soft"
+        : "border-accent-emerald/20 bg-accent-emerald-soft";
+
   return (
-    <div className="rounded-lg border px-2.5 py-2">
+    <div className={`rounded-xl border px-3 py-2.5 ${surface}`}>
       <p className="text-caption text-muted-foreground">{label}</p>
       <p className="text-row-value font-semibold tabular-nums">{value}</p>
     </div>

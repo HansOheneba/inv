@@ -15,11 +15,11 @@ const RING_COLOR: Record<ProductPerformanceRow["status"], string> = {
 
 export function ProductPerformanceTable({ rows }: { rows: ProductPerformanceRow[] }) {
   return (
-    <Card className="gap-3 py-4">
-      <CardContent className="px-4">
-        <div className="flex items-center justify-between">
+    <Card className="gap-0 py-5">
+      <CardContent className="px-5">
+        <div className="flex items-center justify-between gap-3">
           <p className="text-section-title">Product performance</p>
-          <Button size="sm" variant="outline" nativeButton={false} render={<Link href="/inventory" />}>
+          <Button variant="outline" nativeButton={false} render={<Link href="/inventory" />}>
             View inventory
           </Button>
         </div>
@@ -59,7 +59,7 @@ export function ProductPerformanceTable({ rows }: { rows: ProductPerformanceRow[
                           <div
                             className={cn(
                               "h-full rounded-full",
-                              row.demandPct > 0 ? "bg-foreground" : "bg-transparent",
+                              row.demandPct > 0 ? "bg-accent-teal" : "bg-transparent",
                             )}
                             style={{ width: `${row.demandPct}%` }}
                           />

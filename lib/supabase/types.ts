@@ -14,6 +14,9 @@ export type OrderStatus =
   | "out_for_delivery"
   | "delivered"
   | "cancelled";
+export type OrderSource = "whatsapp" | "website" | "manual";
+export type PaymentStatus = "unpaid" | "paid" | "refunded" | "cod";
+export type PaymentMethod = "momo" | "card" | "cash" | "bank_transfer";
 
 // supabase-js requires every table/view to carry a `Relationships` array to
 // satisfy its GenericTable/GenericView constraints. We don't model foreign
@@ -224,11 +227,20 @@ export interface Database {
           order_number: number;
           customer_name: string;
           customer_phone: string | null;
+          customer_email: string | null;
           delivery_address: string | null;
+          delivery_city: string | null;
+          delivery_region: string | null;
           maps_url: string | null;
           status: OrderStatus;
+          source: OrderSource;
           notes: string | null;
           discount: number;
+          shipping_fee: number;
+          payment_status: PaymentStatus;
+          payment_method: PaymentMethod | null;
+          payment_reference: string | null;
+          external_id: string | null;
           rider_name: string | null;
           rider_phone: string | null;
           packed_at: string | null;

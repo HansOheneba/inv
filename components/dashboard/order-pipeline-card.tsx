@@ -12,45 +12,63 @@ function formatDuration(hours: number | null): string {
 }
 
 const STAGES = [
-  { key: "confirmed", label: "Confirmed", tone: "text-muted-foreground" },
-  { key: "packed", label: "Packed", tone: "text-status-low" },
-  { key: "outForDelivery", label: "Out for delivery", tone: "text-blue-600" },
-  { key: "deliveredToday", label: "Delivered today", tone: "text-status-available" },
+  {
+    key: "confirmed",
+    label: "Confirmed",
+    tone: "text-accent-sky",
+    surface: "border-accent-sky/20 bg-accent-sky-soft",
+  },
+  {
+    key: "packed",
+    label: "Packed",
+    tone: "text-accent-amber",
+    surface: "border-accent-amber/25 bg-accent-amber-soft",
+  },
+  {
+    key: "outForDelivery",
+    label: "Out for delivery",
+    tone: "text-accent-teal",
+    surface: "border-accent-teal/20 bg-accent-teal-soft",
+  },
+  {
+    key: "deliveredToday",
+    label: "Delivered today",
+    tone: "text-accent-emerald",
+    surface: "border-accent-emerald/20 bg-accent-emerald-soft",
+  },
 ] as const;
 
 export function OrderPipelineCard({ pipeline }: { pipeline: OrderPipeline }) {
   return (
-    <Card className="gap-2.5 py-4">
-      <CardContent className="px-4">
-        <div className="flex items-center justify-between">
-          <p className="text-meta text-muted-foreground">Orders in fulfilment</p>
-          <span className="text-meta tabular-nums text-muted-foreground">
-            {pipeline.openTotal} open
-          </span>
+    <Card className="gap-0 py-5">
+      <CardContent className="px-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-section-title">Orders in fulfilment</p>
+            <p className="text-meta text-muted-foreground">
+              {pipeline.openTotal} open
+              {pipeline.deliveredWeek > 0
+                ? ` · ${pipeline.deliveredWeek} delivered this week`
+                : ""}
+              {pipeline.avgFulfilmentHours !== null
+                ? ` · ${formatDuration(pipeline.avgFulfilmentHours)} avg to delivery`
+                : ""}
+            </p>
+          </div>
+          <Button variant="outline" nativeButton={false} render={<Link href="/orders" />}>
+            View orders
+          </Button>
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
           {STAGES.map((stage) => (
-            <div key={stage.key}>
+            <div key={stage.key} className={cn("rounded-xl border px-4 py-3.5", stage.surface)}>
               <p className={cn("text-page-title font-semibold tabular-nums", stage.tone)}>
                 {pipeline[stage.key]}
               </p>
-              <p className="mt-0.5 text-meta text-muted-foreground">{stage.label}</p>
+              <p className="mt-1 text-meta text-muted-foreground">{stage.label}</p>
             </div>
           ))}
-        </div>
-
-        <p className="mt-3 text-meta text-muted-foreground">
-          {pipeline.deliveredWeek} delivered this week
-          {pipeline.avgFulfilmentHours !== null
-            ? ` • ${formatDuration(pipeline.avgFulfilmentHours)} avg order → delivery`
-            : ""}
-        </p>
-
-        <div className="mt-3 flex items-center justify-end">
-          <Button size="sm" variant="outline" nativeButton={false} render={<Link href="/orders" />}>
-            View orders
-          </Button>
         </div>
       </CardContent>
     </Card>

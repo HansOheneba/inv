@@ -5,6 +5,7 @@ import { getCurrentProfile, isOwner } from "@/lib/auth";
 import { getProductFacets } from "@/lib/data/inventory";
 import { getLocations } from "@/lib/data/locations";
 import { NewProductForm } from "@/components/inventory/new-product-form";
+import { PageShell } from "@/components/app-shell/page-shell";
 import { Button } from "@/components/ui/button";
 
 export default async function NewProductPage() {
@@ -14,24 +15,25 @@ export default async function NewProductPage() {
   const [locations, facets] = await Promise.all([getLocations(), getProductFacets()]);
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-6">
-      <Button
-        variant="ghost"
-        size="sm"
-        className="mb-2 gap-1 text-meta"
-        nativeButton={false}
-        render={<Link href="/inventory" />}
-      >
-        <ArrowLeft className="size-4" />
-        Inventory
-      </Button>
-      <div className="mb-4">
-        <h1 className="text-page-title font-semibold">Add product</h1>
-        <p className="text-meta text-muted-foreground">
-          Create a catalogue entry, its variants, and an optional opening stock count.
-        </p>
+    <PageShell>
+      <div className="max-w-2xl space-y-6">
+        <div>
+          <Button
+            variant="ghost"
+            className="mb-2 -ml-2 gap-1.5 text-meta"
+            nativeButton={false}
+            render={<Link href="/inventory" />}
+          >
+            <ArrowLeft className="size-4" />
+            Inventory
+          </Button>
+          <h1 className="text-page-title font-semibold">Add product</h1>
+          <p className="text-meta text-muted-foreground">
+            Create a catalogue entry, its variants, and an optional opening stock count.
+          </p>
+        </div>
+        <NewProductForm options={{ locations, brands: facets.brands, categories: facets.categories }} />
       </div>
-      <NewProductForm options={{ locations, brands: facets.brands, categories: facets.categories }} />
-    </div>
+    </PageShell>
   );
 }

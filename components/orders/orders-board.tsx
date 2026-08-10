@@ -1,15 +1,23 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MapPin, Bike, Phone, Map } from "lucide-react";
-import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { OrderStatusBadge } from "@/components/orders/order-status-badge";
+import { OrderSourceBadge } from "@/components/orders/order-source-badge";
+import { PaymentStatusBadge } from "@/components/orders/payment-status-badge";
 import { AdvanceOrderButton } from "@/components/orders/advance-order-button";
+import { CancelOrderButton } from "@/components/orders/cancel-order-button";
 import { getBrowserClient } from "@/lib/supabase/client";
-import { cancelOrderAction } from "@/lib/actions/orders";
 import type { OrderListItem } from "@/lib/data/orders";
 import type { OrderStatus } from "@/lib/supabase/types";
 
@@ -24,35 +32,9 @@ const TABS = [
 const ACTIVE_STATUSES: OrderStatus[] = ["confirmed", "packed", "out_for_delivery"];
 
 const currency = (value: number) =>
-  new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 2 }).format(
+  new Intl.NumberFormat("en-GH", { style: "currency", currency: "GHS", maximumFractionDigits: 0 }).format(
     value,
   );
-
-function CancelOrderButton({ orderId }: { orderId: string }) {
-  const [pending, setPending] = useState(false);
-  const router = useRouter();
-
-  return (
-    <form
-      action={async (formData) => {
-        formData.set("orderId", orderId);
-        setPending(true);
-        const result = await cancelOrderAction(formData);
-        setPending(false);
-        if (result.error) {
-          toast.error(result.error);
-          return;
-        }
-        toast.success("Order cancelled");
-        router.refresh();
-      }}
-    >
-      <Button type="submit" size="sm" variant="ghost" className="text-muted-foreground" disabled={pending}>
-        {pending ? "Cancelling…" : "Cancel"}
-      </Button>
-    </form>
-  );
-}
 
 export function OrdersBoard({
   orders,
@@ -64,8 +46,6 @@ export function OrdersBoard({
   const [tab, setTab] = useState<string>("active");
   const router = useRouter();
 
-  // Realtime: refetch the board (server-side, so joins + RLS stay intact) the
-  // instant an order is created or its status changes.
   useEffect(() => {
     const supabase = getBrowserClient();
     if (!supabase) return;
@@ -104,97 +84,77 @@ export function OrdersBoard({
       {filtered.length === 0 ? (
         <p className="py-12 text-center text-meta text-muted-foreground">No orders here.</p>
       ) : (
-        <ul className="space-y-2">
-          {filtered.map((order) => {
-            const canCancel = isOwner && order.status !== "delivered" && order.status !== "cancelled";
-            return (
-              <li key={order.id} className="rounded-lg border p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-row-value font-semibold tabular-nums">#{order.orderNumber}</span>
-                      <span className="truncate text-row-title font-medium">{order.customerName}</span>
+        <div className="overflow-hidden rounded-xl border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-meta">Order</TableHead>
+                <TableHead className="text-meta">Customer</TableHead>
+                <TableHead className="text-meta">Source</TableHead>
+                <TableHead className="text-meta">Payment</TableHead>
+                <TableHead className="text-right text-meta">Items</TableHead>
+                <TableHead className="text-right text-meta">Total</TableHead>
+                <TableHead className="text-meta">Status</TableHead>
+                <TableHead className="text-right text-meta">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((order) => {
+                const canCancel =
+                  isOwner && order.status !== "delivered" && order.status !== "cancelled";
+                return (
+                  <TableRow key={order.id} className="cursor-pointer">
+                    <TableCell className="row-py">
+                      <Link href={`/orders/${order.id}`} className="block">
+                        <p className="text-row-value font-semibold tabular-nums">#{order.orderNumber}</p>
+                        <p className="text-caption text-muted-foreground">
+                          {new Date(order.createdAt).toLocaleString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </Link>
+                    </TableCell>
+                    <TableCell className="row-py">
+                      <Link href={`/orders/${order.id}`} className="block min-w-0">
+                        <p className="truncate text-row-title font-medium">{order.customerName}</p>
+                        <p className="truncate text-meta text-muted-foreground">
+                          {order.customerPhone ?? order.customerEmail ?? "—"}
+                        </p>
+                      </Link>
+                    </TableCell>
+                    <TableCell className="row-py">
+                      <OrderSourceBadge source={order.source} />
+                    </TableCell>
+                    <TableCell className="row-py">
+                      <PaymentStatusBadge status={order.paymentStatus} />
+                    </TableCell>
+                    <TableCell className="row-py text-right text-row-value tabular-nums text-muted-foreground">
+                      {order.itemCount}
+                    </TableCell>
+                    <TableCell className="row-py text-right text-row-value font-semibold tabular-nums">
+                      {currency(order.total)}
+                    </TableCell>
+                    <TableCell className="row-py">
                       <OrderStatusBadge status={order.status} />
-                    </div>
-                    {order.customerPhone ? (
-                      <p className="mt-0.5 flex items-center gap-1 text-meta text-muted-foreground">
-                        <Phone className="size-3" />
-                        {order.customerPhone}
-                      </p>
-                    ) : null}
-                  </div>
-                  <span className="shrink-0 text-row-value font-semibold tabular-nums">
-                    {currency(order.total)}
-                  </span>
-                </div>
-
-                <ul className="mt-2 space-y-0.5">
-                  {order.items.map((item, index) => (
-                    <li key={index} className="flex items-baseline justify-between gap-2 text-meta">
-                      <span className="truncate">
-                        <span className="tabular-nums text-muted-foreground">{item.quantity}×</span>{" "}
-                        {item.productName}
-                        {item.variantName ? (
-                          <span className="text-muted-foreground"> · {item.variantName}</span>
-                        ) : null}
-                        {item.specNote ? (
-                          <span className="text-muted-foreground"> — {item.specNote}</span>
-                        ) : null}
-                      </span>
-                      <span className="shrink-0 tabular-nums text-muted-foreground">
-                        {currency(item.quantity * item.unitPrice)}
-                      </span>
-                    </li>
-                  ))}
-                  {order.discount > 0 ? (
-                    <li className="flex items-baseline justify-between gap-2 text-meta text-status-out">
-                      <span>Discount</span>
-                      <span className="shrink-0 tabular-nums">−{currency(order.discount)}</span>
-                    </li>
-                  ) : null}
-                </ul>
-
-                {order.deliveryAddress ? (
-                  <p className="mt-2 flex items-start gap-1 text-meta text-muted-foreground">
-                    <MapPin className="mt-0.5 size-3 shrink-0" />
-                    {order.deliveryAddress}
-                  </p>
-                ) : null}
-
-                {order.mapsUrl ? (
-                  <a
-                    href={order.mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-1 inline-flex items-center gap-1 text-meta text-blue-600 hover:underline"
-                  >
-                    <Map className="size-3" />
-                    Open in Maps
-                  </a>
-                ) : null}
-
-                {order.notes ? (
-                  <p className="mt-1 text-meta text-muted-foreground">{order.notes}</p>
-                ) : null}
-
-                {order.riderName ? (
-                  <p className="mt-1 flex items-center gap-1 text-meta text-foreground">
-                    <Bike className="size-3" />
-                    {order.riderName}
-                    {order.riderPhone ? (
-                      <span className="text-muted-foreground"> • {order.riderPhone}</span>
-                    ) : null}
-                  </p>
-                ) : null}
-
-                <div className="mt-3 flex items-center justify-end gap-1">
-                  {canCancel ? <CancelOrderButton orderId={order.id} /> : null}
-                  <AdvanceOrderButton orderId={order.id} status={order.status} />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                    </TableCell>
+                    <TableCell className="row-py">
+                      <div
+                        className="flex items-center justify-end gap-1"
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        {canCancel ? <CancelOrderButton orderId={order.id} /> : null}
+                        <AdvanceOrderButton orderId={order.id} status={order.status} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </div>
   );

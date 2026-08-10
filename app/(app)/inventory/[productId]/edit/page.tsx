@@ -5,6 +5,7 @@ import { getCurrentProfile, isOwner } from "@/lib/auth";
 import { getProductDetail, getProductFacets } from "@/lib/data/inventory";
 import { getLocations } from "@/lib/data/locations";
 import { ProductEditForm } from "@/components/inventory/product-edit-form";
+import { PageShell } from "@/components/app-shell/page-shell";
 import { Button } from "@/components/ui/button";
 
 export default async function EditProductPage({
@@ -25,27 +26,28 @@ export default async function EditProductPage({
   if (!product) notFound();
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-6">
-      <Button
-        variant="ghost"
-        size="sm"
-        className="mb-2 gap-1 text-meta"
-        nativeButton={false}
-        render={<Link href="/inventory" />}
-      >
-        <ArrowLeft className="size-4" />
-        Inventory
-      </Button>
-      <div className="mb-4">
-        <h1 className="text-page-title font-semibold">Edit product</h1>
-        <p className="text-meta text-muted-foreground">
-          Update details, edit or archive variants, and add new ones.
-        </p>
+    <PageShell>
+      <div className="max-w-2xl space-y-6">
+        <div>
+          <Button
+            variant="ghost"
+            className="mb-2 -ml-2 gap-1.5 text-meta"
+            nativeButton={false}
+            render={<Link href="/inventory" />}
+          >
+            <ArrowLeft className="size-4" />
+            Inventory
+          </Button>
+          <h1 className="text-page-title font-semibold">Edit product</h1>
+          <p className="text-meta text-muted-foreground">
+            Update details, edit or archive variants, and add new ones.
+          </p>
+        </div>
+        <ProductEditForm
+          product={product}
+          options={{ locations, brands: facets.brands, categories: facets.categories }}
+        />
       </div>
-      <ProductEditForm
-        product={product}
-        options={{ locations, brands: facets.brands, categories: facets.categories }}
-      />
-    </div>
+    </PageShell>
   );
 }

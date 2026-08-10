@@ -59,7 +59,7 @@ export function AdvanceOrderButton({
           run(formData);
         }}
       >
-        <Button type="submit" size="sm" variant="outline" disabled={pending}>
+        <Button type="submit" variant="outline" disabled={pending}>
           {pending ? "Updating…" : label}
         </Button>
       </form>
@@ -68,7 +68,7 @@ export function AdvanceOrderButton({
 
   return (
     <>
-      <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+      <Button variant="outline" onClick={() => setOpen(true)}>
         {label}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>

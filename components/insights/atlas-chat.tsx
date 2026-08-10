@@ -151,7 +151,7 @@ export function AtlasChat({
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <ScrollArea className="min-h-0 flex-1">
-        <div ref={viewportRef} className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-4">
+        <div ref={viewportRef} className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-5 py-5 lg:px-6">
           {intro.map((content, index) => (
             <div key={`intro-${index}`} className="flex items-start gap-2.5">
               <AssistantAvatar />
@@ -208,16 +208,15 @@ export function AtlasChat({
         </div>
       </ScrollArea>
 
-      <div className="border-t px-4 py-3">
-        <div className="mx-auto max-w-3xl">
+      <div className="border-t px-5 py-4 lg:px-6">
+        <div className="mx-auto w-full max-w-4xl">
           {!hasUserMessage ? (
-            <div className="mb-2 flex flex-wrap gap-1.5">
+            <div className="mb-3 flex flex-wrap gap-2">
               {prompts.map((prompt) => (
                 <Button
                   key={prompt}
                   type="button"
                   variant="outline"
-                  size="sm"
                   className="text-meta"
                   onClick={() => send(prompt)}
                   disabled={thinking}

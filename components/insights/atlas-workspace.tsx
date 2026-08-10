@@ -27,13 +27,13 @@ export function AtlasWorkspace({
   const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
-    <div className="flex h-[calc(100dvh-3rem)]">
-      <aside className="hidden w-64 shrink-0 border-r md:block">
+    <div className="flex h-[calc(100dvh-3.5rem)]">
+      <aside className="hidden w-72 shrink-0 border-r md:block">
         <ConversationList conversations={conversations} activeId={activeId} />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-2 border-b px-4 py-2.5">
+        <div className="flex items-center gap-3 border-b px-5 py-3 lg:px-6">
           <Button
             variant="ghost"
             size="icon"

@@ -95,7 +95,7 @@ export async function buildAtlasContext(): Promise<string> {
   const revenueLine = revenue.map((d) => `${d.label} ${ghs(d.value)}`).join(", ");
 
   const channelLine = channel.hasData
-    ? `Physical store ${channel.inStorePct}%, online ${channel.onlinePct}% of all-time revenue`
+    ? `Website ${channel.websitePct}%, social media ${channel.socialPct}% of all-time revenue`
     : "Not enough sales yet to split channels";
 
   return [

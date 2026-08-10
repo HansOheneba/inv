@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { getOrders } from "@/lib/data/orders";
 import { getCurrentProfile, isOwner } from "@/lib/auth";
 import { OrdersBoard } from "@/components/orders/orders-board";
+import { PageHeader, PageShell } from "@/components/app-shell/page-shell";
 import { Button } from "@/components/ui/button";
 
 export default async function OrdersPage() {
@@ -16,22 +17,20 @@ export default async function OrdersPage() {
   ).length;
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-6">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-page-title font-semibold">Orders</h1>
-          <p className="text-meta text-muted-foreground">
-            {openCount} order{openCount === 1 ? "" : "s"} in progress
-          </p>
-        </div>
-        {owner ? (
-          <Button size="sm" className="gap-1.5" nativeButton={false} render={<Link href="/orders/new" />}>
-            <Plus className="size-4" />
-            New order
-          </Button>
-        ) : null}
-      </div>
+    <PageShell>
+      <PageHeader
+        title="Orders"
+        description={`${openCount} order${openCount === 1 ? "" : "s"} in progress · WhatsApp & website`}
+        actions={
+          owner ? (
+            <Button className="gap-1.5" nativeButton={false} render={<Link href="/orders/new" />}>
+              <Plus className="size-4" />
+              New order
+            </Button>
+          ) : null
+        }
+      />
       <OrdersBoard orders={orders} isOwner={owner} />
-    </div>
+    </PageShell>
   );
 }

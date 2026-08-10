@@ -84,6 +84,17 @@
   --color-status-out: var(--status-out);
   --color-status-out-foreground: var(--status-out-foreground);
 
+  --color-accent-teal: var(--accent-teal);
+  --color-accent-teal-soft: var(--accent-teal-soft);
+  --color-accent-sky: var(--accent-sky);
+  --color-accent-sky-soft: var(--accent-sky-soft);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-amber-soft: var(--accent-amber-soft);
+  --color-accent-emerald: var(--accent-emerald);
+  --color-accent-emerald-soft: var(--accent-emerald-soft);
+  --color-accent-brand: var(--accent-brand);
+  --color-accent-brand-foreground: var(--accent-brand-foreground);
+
   /* Semantic aliases so hierarchy can be built with color, per the typography rules */
   --color-success: var(--status-available);
   --color-warning: var(--status-low);
@@ -109,11 +120,6 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -130,6 +136,24 @@
   --status-low-foreground: oklch(0.2 0.02 75);
   --status-out: oklch(0.58 0.22 27);
   --status-out-foreground: oklch(0.99 0 0);
+
+  /* Dashboard accents — teal money, sky ops, amber packing (not purple) */
+  --accent-teal: oklch(0.55 0.12 175);
+  --accent-teal-soft: oklch(0.95 0.03 175);
+  --accent-sky: oklch(0.58 0.14 240);
+  --accent-sky-soft: oklch(0.95 0.03 240);
+  --accent-amber: oklch(0.72 0.14 75);
+  --accent-amber-soft: oklch(0.96 0.04 85);
+  --accent-emerald: oklch(0.58 0.14 155);
+  --accent-emerald-soft: oklch(0.95 0.04 155);
+  --accent-brand: oklch(0.42 0.09 200);
+  --accent-brand-foreground: oklch(0.99 0 0);
+
+  --chart-1: oklch(0.58 0.14 155);
+  --chart-2: oklch(0.58 0.14 240);
+  --chart-3: oklch(0.72 0.14 75);
+  --chart-4: oklch(0.55 0.12 175);
+  --chart-5: oklch(0.58 0.22 27);
 
   /* Density mode — compact (warehouse mode) is the default */
   --row-h: 52px;

@@ -46,9 +46,9 @@ export function ShipmentsView({
       {filtered.length === 0 ? (
         <p className="py-12 text-center text-meta text-muted-foreground">No shipments here.</p>
       ) : (
-        <ul className="divide-y overflow-hidden rounded-lg border">
+        <ul className="divide-y overflow-hidden rounded-xl border">
           {filtered.map((shipment) => (
-            <li key={shipment.id} className="flex items-center justify-between gap-3 px-3 py-3">
+            <li key={shipment.id} className="flex items-center justify-between gap-3 px-4 py-3.5">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <p className="truncate text-row-title font-medium">{shipment.referenceCode}</p>

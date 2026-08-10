@@ -109,7 +109,7 @@ export function NewShipmentDialog({ options }: { options: ShipmentFormOptions })
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button size="sm" className="gap-1.5" />}>
+      <DialogTrigger render={<Button className="gap-1.5" />}>
         <Plus className="size-4" />
         Log shipment
       </DialogTrigger>

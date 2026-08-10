@@ -205,3 +205,43 @@ select * from (values
   ('dddddddd-dddd-dddd-dddd-dddddddddd07'::uuid, 'cccccccc-cccc-cccc-cccc-cccccccccc04'::uuid, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa12'::uuid, 'bbbbbbbb-bbbb-bbbb-bbbb-000000001202'::uuid, 1, 280.00, '100ml bottle')
 ) as v (id, order_id, product_id, variant_id, quantity, unit_price, spec_note)
 where not exists (select 1 from public.order_items where id = v.id);
+
+-- Website checkout demos — paid online, with email / city / shipping / external_id
+-- so the Orders table can show source + payment without a live storefront yet.
+insert into public.orders (
+  id, customer_name, customer_phone, customer_email, delivery_address, delivery_city, delivery_region,
+  maps_url, status, source, notes, discount, shipping_fee, payment_status, payment_method,
+  payment_reference, external_id, rider_name, rider_phone, packed_at, dispatched_at, delivered_at, created_at
+)
+select * from (values
+  (
+    'cccccccc-cccc-cccc-cccc-cccccccccc11'::uuid,
+    'Akosua Darko', '+233 24 880 1122', 'akosua.darko@email.com',
+    '12 Labone Crescent', 'Accra', 'Greater Accra',
+    null, 'confirmed', 'website', 'Leave with security if nobody home',
+    0.00, 25.00, 'paid', 'momo', 'MM-784512', 'WEB-1001',
+    null, null, null, null, null, now() - interval '45 minutes'
+  ),
+  (
+    'cccccccc-cccc-cccc-cccc-cccccccccc12'::uuid,
+    'Kojo Asante', '+233 50 221 3344', 'kojo.asante@email.com',
+    'House 8, Beach Road', 'Cape Coast', 'Central',
+    null, 'packed', 'website', null,
+    0.00, 40.00, 'paid', 'card', 'ch_3Pk9aG2eZv', 'WEB-1002',
+    null, null, now() - interval '30 minutes', null, null, now() - interval '5 hours'
+  )
+) as v (
+  id, customer_name, customer_phone, customer_email, delivery_address, delivery_city, delivery_region,
+  maps_url, status, source, notes, discount, shipping_fee, payment_status, payment_method,
+  payment_reference, external_id, rider_name, rider_phone, packed_at, dispatched_at, delivered_at, created_at
+)
+where not exists (select 1 from public.orders where id = v.id);
+
+insert into public.order_items (id, order_id, product_id, variant_id, quantity, unit_price, spec_note)
+select * from (values
+  ('dddddddd-dddd-dddd-dddd-dddddddddd11'::uuid, 'cccccccc-cccc-cccc-cccc-cccccccccc11'::uuid, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa02'::uuid, 'bbbbbbbb-bbbb-bbbb-bbbb-000000000201'::uuid, 1, 280.00, null),
+  ('dddddddd-dddd-dddd-dddd-dddddddddd12'::uuid, 'cccccccc-cccc-cccc-cccc-cccccccccc11'::uuid, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa11'::uuid, 'bbbbbbbb-bbbb-bbbb-bbbb-000000001100'::uuid, 1, 80.00, null),
+  ('dddddddd-dddd-dddd-dddd-dddddddddd13'::uuid, 'cccccccc-cccc-cccc-cccc-cccccccccc12'::uuid, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa05'::uuid, 'bbbbbbbb-bbbb-bbbb-bbbb-000000000501'::uuid, 1, 360.00, null),
+  ('dddddddd-dddd-dddd-dddd-dddddddddd14'::uuid, 'cccccccc-cccc-cccc-cccc-cccccccccc12'::uuid, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa09'::uuid, 'bbbbbbbb-bbbb-bbbb-bbbb-000000000900'::uuid, 2, 240.00, null)
+) as v (id, order_id, product_id, variant_id, quantity, unit_price, spec_note)
+where not exists (select 1 from public.order_items where id = v.id);

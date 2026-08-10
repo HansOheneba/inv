@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireSupabaseContext } from "@/lib/supabase/context";
 import { getCurrentProfile, isOwner } from "@/lib/auth";
-import type { OrderStatus } from "@/lib/supabase/types";
+import type { OrderSource, OrderStatus } from "@/lib/supabase/types";
 
 export interface OrderActionResult {
   error?: string;
@@ -62,8 +62,10 @@ export async function createOrderAction(
       delivery_address: deliveryAddress,
       maps_url: mapsUrl,
       status: "confirmed",
+      source: "manual",
       notes,
       discount,
+      payment_status: "unpaid",
       created_by: profile.id,
     })
     .select("id, order_number")
@@ -112,7 +114,14 @@ const ADVANCE: Partial<Record<OrderStatus, OrderStatus>> = {
 async function recordSaleFromOrder(
   supabase: Awaited<ReturnType<typeof requireSupabaseContext>>["supabase"],
   profileId: string,
-  order: { id: string; customer_name: string; customer_phone: string | null; discount: number },
+  order: {
+    id: string;
+    customer_name: string;
+    customer_phone: string | null;
+    discount: number;
+    shipping_fee: number;
+    source: OrderSource;
+  },
 ): Promise<void> {
   const { data: items } = await supabase
     .from("order_items")
@@ -121,10 +130,12 @@ async function recordSaleFromOrder(
 
   if (!items || items.length === 0) return;
 
-  const { data: whatsappChannel } = await supabase
+  // Website checkouts map to the Online Store channel; WhatsApp/manual stay on WhatsApp.
+  const channelType = order.source === "website" ? "online" : "whatsapp";
+  const { data: channel } = await supabase
     .from("sales_channels")
     .select("id")
-    .eq("type", "whatsapp")
+    .eq("type", channelType)
     .limit(1)
     .maybeSingle();
 
@@ -135,15 +146,18 @@ async function recordSaleFromOrder(
     .limit(1)
     .maybeSingle();
 
-  // The discount the owner agreed at order time comes off the sale total, so
-  // revenue reporting matches what the customer actually paid.
+  // Discount and shipping from checkout land in the sale total so revenue
+  // reporting matches what the customer actually paid.
   const subtotal = items.reduce((sum, item) => sum + item.quantity * Number(item.unit_price), 0);
-  const total = Math.max(0, subtotal - Number(order.discount ?? 0));
+  const total = Math.max(
+    0,
+    subtotal - Number(order.discount ?? 0) + Number(order.shipping_fee ?? 0),
+  );
 
   const { data: sale } = await supabase
     .from("sales")
     .insert({
-      channel_id: whatsappChannel?.id ?? null,
+      channel_id: channel?.id ?? null,
       location_id: primaryLocation?.id ?? null,
       customer_name: order.customer_name,
       customer_contact: order.customer_phone,
@@ -227,7 +241,7 @@ export async function advanceOrderAction(formData: FormData): Promise<OrderActio
   const { supabase } = await requireSupabaseContext();
   const { data: order } = await supabase
     .from("orders")
-    .select("id, order_number, status, customer_name, customer_phone, discount")
+    .select("id, order_number, status, customer_name, customer_phone, discount, shipping_fee, source")
     .eq("id", orderId)
     .single();
 
@@ -273,6 +287,7 @@ export async function advanceOrderAction(formData: FormData): Promise<OrderActio
   });
 
   revalidatePath("/orders");
+  revalidatePath(`/orders/${orderId}`);
   revalidatePath("/inventory");
   revalidatePath("/sales");
   revalidatePath("/");
@@ -310,6 +325,7 @@ export async function cancelOrderAction(formData: FormData): Promise<OrderAction
   });
 
   revalidatePath("/orders");
+  revalidatePath(`/orders/${orderId}`);
   revalidatePath("/");
 
   return { success: true };

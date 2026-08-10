@@ -1,6 +1,6 @@
 import { getDashboardStats, getPendingShipments } from "@/lib/data/dashboard";
 import { getInventoryOverview } from "@/lib/data/inventory";
-import { getSales } from "@/lib/data/sales";
+import { getChannelBreakdown, getRecentSales } from "@/lib/data/sales";
 
 export interface BusinessSnapshot {
   stockValue: number;
@@ -20,17 +20,15 @@ export interface BusinessSnapshot {
 }
 
 /**
- * Pulls together a snapshot of live business data. This is the "context"
- * that would be handed to a real RAG pipeline later — for now Atlas's demo
- * answers are generated from this object with simple rules instead of an
- * LLM call.
+ * Pulls together a snapshot of live business data for Atlas opening insights.
  */
 export async function getBusinessSnapshot(options?: { includeCosts?: boolean }): Promise<BusinessSnapshot> {
-  const [stats, items, pendingShipments, recentSales] = await Promise.all([
+  const [stats, items, pendingShipments, recentSales, channels] = await Promise.all([
     getDashboardStats({ includeStockValue: options?.includeCosts }),
     getInventoryOverview({ includeCosts: options?.includeCosts }),
     getPendingShipments(5),
-    getSales(50),
+    getRecentSales(50),
+    getChannelBreakdown(),
   ]);
 
   const lowStockItems = items
@@ -49,16 +47,7 @@ export async function getBusinessSnapshot(options?: { includeCosts?: boolean }):
     .slice(0, 8)
     .map((item) => ({ name: item.name, unit: item.unit }));
 
-  const channelCounts = new Map<string, number>();
-  for (const sale of recentSales) {
-    if (sale.status !== "completed") continue;
-    const name = sale.channelName ?? "Direct";
-    channelCounts.set(name, (channelCounts.get(name) ?? 0) + 1);
-  }
-  let topChannel: { name: string; count: number } | null = null;
-  for (const [name, count] of channelCounts) {
-    if (!topChannel || count > topChannel.count) topChannel = { name, count };
-  }
+  const leading = channels[0] ?? null;
 
   return {
     stockValue: stats.stockValue,
@@ -73,7 +62,7 @@ export async function getBusinessSnapshot(options?: { includeCosts?: boolean }):
       status: s.status,
       expectedArrival: s.expectedArrival,
     })),
-    recentSalesCount: recentSales.filter((s) => s.status === "completed").length,
-    topChannel,
+    recentSalesCount: recentSales.length,
+    topChannel: leading ? { name: leading.name, count: leading.orders } : null,
   };
 }

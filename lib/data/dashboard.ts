@@ -167,12 +167,14 @@ export async function getWeeklyRevenueTrend(): Promise<RevenueTrendPoint[]> {
 }
 
 export interface ChannelSplit {
-  inStorePct: number;
-  onlinePct: number;
+  websitePct: number;
+  socialPct: number;
   hasData: boolean;
 }
 
-/** Splits all-time completed revenue between the physical store and every online channel. */
+const SOCIAL_CHANNEL_TYPES = new Set(["whatsapp", "instagram", "facebook"]);
+
+/** Splits all-time completed revenue between the website and social channels. */
 export async function getChannelSplit(): Promise<ChannelSplit> {
   const { supabase } = await requireSupabaseContext();
 
@@ -183,19 +185,21 @@ export async function getChannelSplit(): Promise<ChannelSplit> {
     .returns<{ total_amount: number; channel: { type: string } | null }[]>();
 
   const rows = data ?? [];
-  let inStore = 0;
-  let online = 0;
+  let website = 0;
+  let social = 0;
   for (const row of rows) {
     const channel = Array.isArray(row.channel) ? row.channel[0] : row.channel;
-    if (channel?.type === "physical_store") inStore += Number(row.total_amount);
-    else online += Number(row.total_amount);
+    const amount = Number(row.total_amount);
+    if (channel?.type === "online") website += amount;
+    else if (!channel?.type || SOCIAL_CHANNEL_TYPES.has(channel.type)) social += amount;
+    // physical_store (legacy) is ignored — no walk-in store in this business
   }
 
-  const total = inStore + online;
-  if (total <= 0) return { inStorePct: 0, onlinePct: 0, hasData: false };
+  const total = website + social;
+  if (total <= 0) return { websitePct: 0, socialPct: 0, hasData: false };
 
-  const inStorePct = Math.round((inStore / total) * 100);
-  return { inStorePct, onlinePct: 100 - inStorePct, hasData: true };
+  const websitePct = Math.round((website / total) * 100);
+  return { websitePct, socialPct: 100 - websitePct, hasData: true };
 }
 
 export async function getRecentActivity(limit = 8): Promise<ActivityItem[]> {

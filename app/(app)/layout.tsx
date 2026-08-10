@@ -14,7 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <AppSidebar profile={profile} showEmployees={isOwner(profile)} showAtlas={isOwner(profile)} />
       <SidebarInset>
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <div className="flex-1">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
