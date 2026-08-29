@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createProductAction, type CreateProductResult } from "@/lib/actions/products";
+import { ImageUploadField } from "@/components/inventory/image-upload-field";
+import { VariantPricingFields } from "@/components/inventory/variant-pricing-fields";
+import type { DiscountType } from "@/lib/inventory/pricing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,13 +19,18 @@ import {
 } from "@/components/ui/select";
 import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
 import { randomSkuSuffix, suggestProductSku } from "@/lib/sku";
+import type { AdminDepartment } from "@/lib/data/departments";
 import type { Tables } from "@/lib/supabase/types";
 
 interface VariantRow {
   key: string;
   label: string;
+  color: string;
+  imageUrl: string;
+  listPrice: string;
+  discountType: DiscountType | "";
+  discountValue: string;
   cost: string;
-  sale: string;
   reorder: string;
   opening: string;
 }
@@ -30,11 +38,22 @@ interface VariantRow {
 export interface NewProductFormOptions {
   locations: Tables<"locations">[];
   brands: string[];
-  categories: string[];
+  departments: AdminDepartment[];
 }
 
 function newRow(): VariantRow {
-  return { key: crypto.randomUUID(), label: "", cost: "0", sale: "0", reorder: "0", opening: "0" };
+  return {
+    key: crypto.randomUUID(),
+    label: "",
+    color: "",
+    imageUrl: "",
+    listPrice: "0",
+    discountType: "",
+    discountValue: "0",
+    cost: "0",
+    reorder: "0",
+    opening: "0",
+  };
 }
 
 export function NewProductForm({ options }: { options: NewProductFormOptions }) {
@@ -50,9 +69,10 @@ export function NewProductForm({ options }: { options: NewProductFormOptions }) 
   const [skuSuffix] = useState(() => randomSkuSuffix());
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
-  const [category, setCategory] = useState("");
+  const [departmentId, setDepartmentId] = useState(options.departments[0]?.id ?? "");
   const [sku, setSku] = useState("");
   const [skuTouched, setSkuTouched] = useState(false);
+  const [draftId] = useState(() => crypto.randomUUID());
 
   const locationLabels = useMemo(
     () => Object.fromEntries(options.locations.map((location) => [location.id, location.name])),
@@ -62,12 +82,19 @@ export function NewProductForm({ options }: { options: NewProductFormOptions }) 
   const singleLocation = options.locations.length <= 1;
   const multiVariant = variants.length > 1;
 
-  function suggestSku(next: { name: string; brand: string; category: string }) {
+  function suggestSku(next: { name: string; brand: string; departmentName: string }) {
     if (skuTouched) return;
     setSku(
-      suggestProductSku({ name: next.name, brand: next.brand, category: next.category, suffix: skuSuffix }),
+      suggestProductSku({
+        name: next.name,
+        brand: next.brand,
+        category: next.departmentName,
+        suffix: skuSuffix,
+      }),
     );
   }
+
+  const selectedDepartment = options.departments.find((row) => row.id === departmentId);
 
   function updateRow(key: string, patch: Partial<VariantRow>) {
     setVariants((rows) => rows.map((row) => (row.key === key ? { ...row, ...patch } : row)));
@@ -96,8 +123,15 @@ export function NewProductForm({ options }: { options: NewProductFormOptions }) 
         variants.map((row) => ({
           label: row.label,
           sku: null,
+          color: row.color,
+          size: "",
+          weight: "",
+          volume: "",
+          imageUrl: row.imageUrl,
+          listPrice: Number(row.listPrice) || 0,
+          discountType: row.discountType,
+          discountValue: Number(row.discountValue) || 0,
           costPrice: Number(row.cost) || 0,
-          salePrice: Number(row.sale) || 0,
           reorderPoint: Number(row.reorder) || 0,
           openingStock: Number(row.opening) || 0,
         })),
@@ -128,7 +162,7 @@ export function NewProductForm({ options }: { options: NewProductFormOptions }) 
             onChange={(event) => {
               const value = event.target.value;
               setName(value);
-              suggestSku({ name: value, brand, category });
+              suggestSku({ name: value, brand, departmentName: selectedDepartment?.name ?? "" });
             }}
             placeholder="e.g. Floral Maxi Dress"
             required
@@ -146,7 +180,7 @@ export function NewProductForm({ options }: { options: NewProductFormOptions }) 
               onChange={(event) => {
                 const value = event.target.value;
                 setBrand(value);
-                suggestSku({ name, brand: value, category });
+                suggestSku({ name, brand: value, departmentName: selectedDepartment?.name ?? "" });
               }}
               placeholder="e.g. Zara, Fenty"
             />
@@ -157,24 +191,23 @@ export function NewProductForm({ options }: { options: NewProductFormOptions }) 
             </datalist>
           </Field>
           <Field>
-            <FieldLabel htmlFor="category">Category</FieldLabel>
-            <Input
-              id="category"
-              name="category"
-              list="category-options"
-              value={category}
-              onChange={(event) => {
-                const value = event.target.value;
-                setCategory(value);
-                suggestSku({ name, brand, category: value });
-              }}
-              placeholder="e.g. Women's Fashion"
-            />
-            <datalist id="category-options">
-              {options.categories.map((categoryOption) => (
-                <option key={categoryOption} value={categoryOption} />
-              ))}
-            </datalist>
+            <FieldLabel htmlFor="departmentId">Department</FieldLabel>
+            <Select
+              value={departmentId}
+              onValueChange={(value) => setDepartmentId(value ?? "")}
+            >
+              <SelectTrigger id="departmentId">
+                <SelectValue placeholder="Select department" />
+              </SelectTrigger>
+              <SelectContent>
+                {options.departments.map((department) => (
+                  <SelectItem key={department.id} value={department.id}>
+                    {department.parentName ? `${department.parentName} · ${department.name}` : department.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <input type="hidden" name="departmentId" value={departmentId} />
           </Field>
         </div>
 
@@ -210,13 +243,13 @@ export function NewProductForm({ options }: { options: NewProductFormOptions }) 
             </Button>
           </div>
           <p className="text-caption text-muted-foreground">
-            Add one row per size/colour/volume. Leave the option name blank for a product with no
-            variations.
+            A product always needs at least one variant before it can appear on the storefront.
+            Upload a photo for each variant — that image is what shoppers see for that option.
           </p>
           <div className="space-y-3">
             {variants.map((row, index) => (
               <div key={row.key} className="space-y-2 rounded-md border p-2.5">
-                <div className="flex items-center gap-2">
+                <div className="flex items-start gap-2">
                   <Input
                     value={row.label}
                     onChange={(event) => updateRow(row.key, { label: event.target.value })}
@@ -236,7 +269,32 @@ export function NewProductForm({ options }: { options: NewProductFormOptions }) 
                     <Trash2 className="size-3.5" />
                   </Button>
                 </div>
-                <div className="grid grid-cols-4 gap-2">
+                {multiVariant ? (
+                  <Field>
+                    <FieldLabel className="text-caption">Color</FieldLabel>
+                    <Input
+                      value={row.color}
+                      onChange={(event) => updateRow(row.key, { color: event.target.value })}
+                      placeholder="Black, Tan…"
+                    />
+                  </Field>
+                ) : null}
+                <ImageUploadField
+                  value={row.imageUrl}
+                  onChange={(url) => updateRow(row.key, { imageUrl: url })}
+                  productId={draftId}
+                  scope="variants"
+                  label="Photo for this variant"
+                />
+                <VariantPricingFields
+                  row={{
+                    listPrice: row.listPrice,
+                    discountType: row.discountType,
+                    discountValue: row.discountValue,
+                  }}
+                  onChange={(patch) => updateRow(row.key, patch)}
+                />
+                <div className="grid grid-cols-3 gap-2">
                   <Field>
                     <FieldLabel className="text-caption" htmlFor={`cost-${row.key}`}>
                       Cost
@@ -248,19 +306,6 @@ export function NewProductForm({ options }: { options: NewProductFormOptions }) 
                       step="0.01"
                       value={row.cost}
                       onChange={(event) => updateRow(row.key, { cost: event.target.value })}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel className="text-caption" htmlFor={`sale-${row.key}`}>
-                      Sale
-                    </FieldLabel>
-                    <Input
-                      id={`sale-${row.key}`}
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      value={row.sale}
-                      onChange={(event) => updateRow(row.key, { sale: event.target.value })}
                     />
                   </Field>
                   <Field>

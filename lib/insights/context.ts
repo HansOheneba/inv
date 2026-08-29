@@ -11,7 +11,7 @@ import { getProductPerformance } from "@/lib/data/product-performance";
 const ghs = (value: number) => `GHS ${Math.round(value).toLocaleString("en-GH")}`;
 
 interface CategoryRollup {
-  category: string;
+  department: string;
   products: number;
   stock: number;
   low: number;
@@ -39,9 +39,9 @@ export async function buildAtlasContext(): Promise<string> {
 
   const categories = new Map<string, CategoryRollup>();
   for (const item of items) {
-    const key = item.category ?? "Uncategorised";
+    const key = item.department ?? "Uncategorised";
     const roll = categories.get(key) ?? {
-      category: key,
+      department: key,
       products: 0,
       stock: 0,
       low: 0,
@@ -60,7 +60,7 @@ export async function buildAtlasContext(): Promise<string> {
     .sort((a, b) => b.stockValue - a.stockValue)
     .map(
       (c) =>
-        `- ${c.category}: ${c.products} products, ${c.stock} units on hand (${ghs(c.stockValue)} at cost)` +
+        `- ${c.department}: ${c.products} products, ${c.stock} units on hand (${ghs(c.stockValue)} at cost)` +
         `${c.low ? `, ${c.low} low` : ""}${c.out ? `, ${c.out} out of stock` : ""}`,
     );
 

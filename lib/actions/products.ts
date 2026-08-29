@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { requireSupabaseContext } from "@/lib/supabase/context";
 import { getCurrentProfile, isOwner } from "@/lib/auth";
 import { suggestVariantSku } from "@/lib/sku";
+import { externalId, slugify } from "@/lib/storefront/utils";
+import {
+  buildVariantAttributes,
+  variantNameFromAttributes,
+} from "@/lib/inventory/variant-attributes";
+import { resolveVariantPricing, type DiscountType } from "@/lib/inventory/pricing";
 
 export interface CreateProductResult {
   error?: string;
@@ -14,8 +20,15 @@ export interface CreateProductResult {
 interface VariantInput {
   label: string;
   sku: string | null;
+  color: string;
+  size: string;
+  weight: string;
+  volume: string;
+  imageUrl: string;
+  listPrice: number;
+  discountType: DiscountType | "";
+  discountValue: number;
   costPrice: number;
-  salePrice: number;
   reorderPoint: number;
   openingStock: number;
 }
@@ -24,6 +37,88 @@ const num = (value: unknown) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 };
+
+async function uniqueProductSlug(
+  supabase: Awaited<ReturnType<typeof requireSupabaseContext>>["supabase"],
+  name: string,
+): Promise<string> {
+  let base = slugify(name);
+  if (!base) base = externalId("product");
+  let candidate = base;
+  let suffix = 2;
+
+  while (true) {
+    const { data } = await supabase.from("products").select("id").eq("slug", candidate).maybeSingle();
+    if (!data) return candidate;
+    candidate = `${base}-${suffix}`;
+    suffix += 1;
+  }
+}
+
+function variantDbPricing(input: {
+  listPrice: number;
+  discountType: DiscountType | "";
+  discountValue: number;
+}) {
+  const pricing = resolveVariantPricing(input);
+  return {
+    sale_price: pricing.salePrice,
+    compare_at_price: pricing.compareAtPrice,
+    discount_type: pricing.discountType,
+    discount_value: pricing.discountType ? pricing.discountValue : null,
+  };
+}
+
+async function syncProductCatalogFromVariants(
+  supabase: Awaited<ReturnType<typeof requireSupabaseContext>>["supabase"],
+  productId: string,
+) {
+  const { data: variants } = await supabase
+    .from("product_variants")
+    .select("sale_price, compare_at_price, cost_price, reorder_point, image_urls, is_default")
+    .eq("product_id", productId)
+    .eq("active", true)
+    .order("is_default", { ascending: false });
+
+  if (!variants?.length) return;
+
+  const salePrices = variants.map((variant) => Number(variant.sale_price));
+  const comparePrices = variants
+    .map((variant) => variant.compare_at_price)
+    .filter((value): value is number => value != null)
+    .map(Number);
+  const lead = variants[0];
+
+  const imageUrls: string[] = [];
+  for (const variant of variants) {
+    for (const url of variant.image_urls ?? []) {
+      if (url && !imageUrls.includes(url)) imageUrls.push(url);
+    }
+  }
+
+  await supabase
+    .from("products")
+    .update({
+      sale_price: Math.max(...salePrices),
+      compare_at_price: comparePrices.length ? Math.max(...comparePrices) : null,
+      cost_price: lead.cost_price,
+      reorder_point: lead.reorder_point,
+      image_urls: imageUrls,
+      image_url: imageUrls[0] ?? null,
+    })
+    .eq("id", productId);
+}
+
+function validateVariantImages(
+  variants: Array<{ active?: boolean; imageUrl: string }>,
+): string | null {
+  const active = variants.filter((variant) => variant.active !== false);
+  if (active.length === 0) return "Add at least one active variant";
+  if (active.some((variant) => !variant.imageUrl.trim())) {
+    return "Upload a photo for each active variant. Storefront images come from variants only.";
+  }
+  return null;
+}
 
 /**
  * Creates a catalogue product together with its variants and, optionally, an
@@ -41,12 +136,13 @@ export async function createProductAction(
 
   const name = String(formData.get("name") ?? "").trim();
   const brand = String(formData.get("brand") ?? "").trim() || null;
-  const category = String(formData.get("category") ?? "").trim() || null;
+  const departmentId = String(formData.get("departmentId") ?? "").trim();
   const unit = String(formData.get("unit") ?? "").trim() || "pcs";
   const sku = String(formData.get("sku") ?? "").trim() || null;
   const locationId = String(formData.get("locationId") ?? "") || null;
 
   if (!name) return { error: "Enter a product name" };
+  if (!departmentId) return { error: "Select a department" };
 
   let variants: VariantInput[] = [];
   try {
@@ -54,25 +150,39 @@ export async function createProductAction(
   } catch {
     return { error: "Could not read the variant list" };
   }
-  variants = variants.filter((variant) => variant.salePrice > 0 || variant.costPrice > 0 || variant.label.trim());
+  variants = variants.filter(
+    (variant) => variant.listPrice > 0 || variant.costPrice > 0 || variant.label.trim(),
+  );
   if (variants.length === 0) return { error: "Add at least one variant with a price" };
 
+  const imageError = validateVariantImages(variants);
+  if (imageError) return { error: imageError };
+
   const single = variants.length === 1;
-  const base = variants[0];
+  const basePricing = resolveVariantPricing(variants[0]);
 
   const { supabase } = await requireSupabaseContext();
+  const slug = await uniqueProductSlug(supabase, name);
+  const productExternalId = externalId("p");
 
   const { data: product, error: productError } = await supabase
     .from("products")
     .insert({
       name,
       brand,
-      category,
+      department_id: departmentId,
+      slug,
+      external_id: productExternalId,
+      catalog_created_at: new Date().toISOString().slice(0, 10),
       unit,
       sku,
-      reorder_point: base.reorderPoint,
-      cost_price: base.costPrice,
-      sale_price: base.salePrice,
+      reorder_point: variants[0].reorderPoint,
+      cost_price: variants[0].costPrice,
+      sale_price: basePricing.salePrice,
+      compare_at_price: basePricing.compareAtPrice,
+      image_urls: [],
+      image_url: null,
+      in_stock: false,
       created_by: profile.id,
     })
     .select("id")
@@ -84,16 +194,28 @@ export async function createProductAction(
 
   let openingTotal = 0;
   for (const [index, variant] of variants.entries()) {
-    const variantName = single ? "Default" : variant.label.trim() || `Option ${index + 1}`;
+    const attributes = buildVariantAttributes({
+      color: variant.color,
+      size: variant.size,
+      weight: variant.weight,
+      volume: variant.volume,
+    });
+    const variantName = single
+      ? "Default"
+      : variantNameFromAttributes(attributes, variant.label.trim() || `Option ${index + 1}`);
+    const pricing = variantDbPricing(variant);
 
     const { data: created, error: variantError } = await supabase
       .from("product_variants")
       .insert({
         product_id: product.id,
         name: variantName,
+        external_id: externalId("v"),
         sku: single ? sku : variant.sku || suggestVariantSku(sku ?? "", variantName),
+        attributes,
+        image_urls: variant.imageUrl ? [variant.imageUrl] : null,
         cost_price: variant.costPrice,
-        sale_price: variant.salePrice,
+        ...pricing,
         reorder_point: variant.reorderPoint,
         is_default: single,
       })
@@ -127,6 +249,8 @@ export async function createProductAction(
     }
   }
 
+  await syncProductCatalogFromVariants(supabase, product.id);
+
   await supabase.from("activity_log").insert({
     user_id: profile.id,
     action_type: "product.create",
@@ -146,8 +270,15 @@ export async function createProductAction(
 interface EditVariantInput {
   id: string | null;
   label: string;
+  color: string;
+  size: string;
+  weight: string;
+  volume: string;
+  imageUrl: string;
+  listPrice: number;
+  discountType: DiscountType | "";
+  discountValue: number;
   costPrice: number;
-  salePrice: number;
   reorderPoint: number;
   active: boolean;
   openingStock: number;
@@ -172,12 +303,13 @@ export async function updateProductAction(
 
   const name = String(formData.get("name") ?? "").trim();
   const brand = String(formData.get("brand") ?? "").trim() || null;
-  const category = String(formData.get("category") ?? "").trim() || null;
+  const departmentId = String(formData.get("departmentId") ?? "").trim();
   const unit = String(formData.get("unit") ?? "").trim() || "pcs";
   const sku = String(formData.get("sku") ?? "").trim() || null;
   const locationId = String(formData.get("locationId") ?? "") || null;
 
   if (!name) return { error: "Enter a product name" };
+  if (!departmentId) return { error: "Select a department" };
 
   let variants: EditVariantInput[] = [];
   try {
@@ -190,20 +322,19 @@ export async function updateProductAction(
     return { error: "Keep at least one active variant" };
   }
 
+  const imageError = validateVariantImages(variants);
+  if (imageError) return { error: imageError };
+
   const { supabase } = await requireSupabaseContext();
 
-  const base = variants.find((variant) => variant.active) ?? variants[0];
   const { error: productError } = await supabase
     .from("products")
     .update({
       name,
       brand,
-      category,
+      department_id: departmentId,
       unit,
       sku,
-      reorder_point: base.reorderPoint,
-      cost_price: base.costPrice,
-      sale_price: base.salePrice,
     })
     .eq("id", productId);
 
@@ -213,13 +344,27 @@ export async function updateProductAction(
   let addedStock = 0;
 
   for (const [index, variant] of variants.entries()) {
+    const attributes = buildVariantAttributes({
+      color: variant.color,
+      size: variant.size,
+      weight: variant.weight,
+      volume: variant.volume,
+    });
+    const variantName = variantNameFromAttributes(
+      attributes,
+      variant.label.trim() || `Option ${index + 1}`,
+    );
+    const pricing = variantDbPricing(variant);
+
     if (variant.id) {
       const { error: updateError } = await supabase
         .from("product_variants")
         .update({
-          name: variant.label.trim() || "Default",
+          name: variantName,
+          attributes,
+          image_urls: variant.imageUrl ? [variant.imageUrl] : null,
           cost_price: variant.costPrice,
-          sale_price: variant.salePrice,
+          ...pricing,
           reorder_point: variant.reorderPoint,
           active: variant.active,
         })
@@ -231,15 +376,17 @@ export async function updateProductAction(
       continue;
     }
 
-    const variantName = variant.label.trim() || `Option ${index + 1}`;
     const { data: created, error: variantError } = await supabase
       .from("product_variants")
       .insert({
         product_id: productId,
         name: variantName,
+        external_id: externalId("v"),
         sku: suggestVariantSku(sku ?? "", variantName),
+        attributes,
+        image_urls: variant.imageUrl ? [variant.imageUrl] : null,
         cost_price: variant.costPrice,
-        sale_price: variant.salePrice,
+        ...pricing,
         reorder_point: variant.reorderPoint,
         is_default: false,
       })
@@ -277,6 +424,8 @@ export async function updateProductAction(
   if (activeIds.length === 1) {
     await supabase.from("product_variants").update({ is_default: true }).eq("id", activeIds[0]);
   }
+
+  await syncProductCatalogFromVariants(supabase, productId);
 
   await supabase.from("activity_log").insert({
     user_id: profile.id,

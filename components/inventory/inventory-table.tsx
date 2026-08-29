@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge } from "@/components/inventory/status-badge";
+import { ProductImage } from "@/components/inventory/product-image";
 import { AdjustStockDialog } from "@/components/inventory/adjust-stock-dialog";
 import { ProductDetailSheet } from "@/components/inventory/product-detail-sheet";
 import { getProductDetailAction } from "@/lib/actions/inventory";
@@ -28,7 +29,7 @@ import type { InventoryItem, ProductDetail, VariantDetail } from "@/lib/data/inv
 import type { Tables } from "@/lib/supabase/types";
 
 type QuickAction = "adjust";
-type SortField = "name" | "brand" | "sku" | "category" | "stock" | "status" | "price";
+type SortField = "name" | "brand" | "sku" | "department" | "stock" | "status" | "price";
 type SortDir = "asc" | "desc";
 
 const currency = (value: number) =>
@@ -46,8 +47,8 @@ function compare(a: InventoryItem, b: InventoryItem, field: SortField): number {
       return (a.brand ?? "").localeCompare(b.brand ?? "");
     case "sku":
       return (a.sku ?? "").localeCompare(b.sku ?? "");
-    case "category":
-      return (a.category ?? "").localeCompare(b.category ?? "");
+    case "department":
+      return (a.department ?? "").localeCompare(b.department ?? "");
     case "stock":
       return a.totalStock - b.totalStock;
     case "status":
@@ -116,7 +117,7 @@ export function InventoryTable({
           (item) =>
             item.name.toLowerCase().includes(q) ||
             item.sku?.toLowerCase().includes(q) ||
-            item.category?.toLowerCase().includes(q) ||
+            item.department?.toLowerCase().includes(q) ||
             item.brand?.toLowerCase().includes(q),
         )
       : items;
@@ -134,7 +135,7 @@ export function InventoryTable({
         <Input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search by name, SKU, category…"
+          placeholder="Search by name, SKU, department…"
           className="h-9 pl-8 text-row-value"
         />
       </div>
@@ -143,7 +144,7 @@ export function InventoryTable({
         <div className="flex flex-col items-center justify-center gap-2 rounded-lg border px-8 py-16 text-center">
           <PackageSearch className="size-8 text-muted-foreground" />
           <p className="text-row-title font-medium">No products match &ldquo;{query}&rdquo;</p>
-          <p className="text-meta text-muted-foreground">Try a different name, SKU, or category.</p>
+          <p className="text-meta text-muted-foreground">Try a different name, SKU, or department.</p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg border">
@@ -159,8 +160,8 @@ export function InventoryTable({
                 <SortableHead field="sku" sort={sort} onSort={toggleSort}>
                   SKU
                 </SortableHead>
-                <SortableHead field="category" sort={sort} onSort={toggleSort}>
-                  Category
+                <SortableHead field="department" sort={sort} onSort={toggleSort}>
+                  Department
                 </SortableHead>
                 <SortableHead field="stock" sort={sort} onSort={toggleSort} align="right">
                   Stock
@@ -188,13 +189,16 @@ export function InventoryTable({
                   onClick={() => openDetail(item)}
                 >
                   <TableCell className="row-py">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate text-row-title font-medium">{item.name}</span>
-                      {item.variantCount > 1 ? (
-                        <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-meta text-muted-foreground">
-                          {item.variantCount} variants
-                        </span>
-                      ) : null}
+                    <div className="flex items-center gap-2.5">
+                      <ProductImage src={item.imageUrl} alt={item.name} size="sm" />
+                      <div className="min-w-0">
+                        <span className="truncate text-row-title font-medium">{item.name}</span>
+                        {item.variantCount > 1 ? (
+                          <span className="ml-2 shrink-0 rounded bg-muted px-1.5 py-0.5 text-meta text-muted-foreground">
+                            {item.variantCount} variants
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="row-py text-meta text-muted-foreground">
@@ -204,7 +208,7 @@ export function InventoryTable({
                     {item.sku ?? "—"}
                   </TableCell>
                   <TableCell className="row-py text-meta text-muted-foreground">
-                    {item.category ?? "—"}
+                    {item.department ?? "—"}
                   </TableCell>
                   <TableCell className="row-py text-right text-row-value font-semibold tabular-nums">
                     {item.totalStock}

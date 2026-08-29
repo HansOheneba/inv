@@ -1,4 +1,5 @@
 import { requireSupabaseContext } from "@/lib/supabase/context";
+import { getDepartmentsForAdmin, type AdminDepartment } from "@/lib/data/departments";
 
 export type StockStatus = "available" | "low" | "out";
 
@@ -6,7 +7,7 @@ export interface InventoryItem {
   productId: string;
   name: string;
   sku: string | null;
-  category: string | null;
+  department: string | null;
   brand: string | null;
   unit: string;
   totalStock: number;
@@ -17,6 +18,8 @@ export interface InventoryItem {
   status: StockStatus;
   costPrice: number;
   salePrice: number;
+  inStock: boolean;
+  imageUrl: string | null;
 }
 
 export function stockStatus(totalStock: number, reorderPoint: number): StockStatus {
@@ -45,7 +48,7 @@ export async function getInventoryOverview(options?: {
     productId: row.product_id,
     name: row.name,
     sku: row.sku,
-    category: row.category,
+    department: row.department_name,
     brand: row.brand,
     unit: row.unit,
     totalStock: row.total_stock,
@@ -56,28 +59,30 @@ export async function getInventoryOverview(options?: {
     status: stockStatus(row.total_stock, row.reorder_point),
     costPrice: options?.includeCosts === false ? 0 : row.cost_price,
     salePrice: row.sale_price,
+    inStock: row.in_stock,
+    imageUrl: row.image_url,
   }));
 }
 
 /**
- * Distinct brand and category values already in use — feeds the New Product
- * form's autocomplete so the owner reuses existing spellings instead of
- * fragmenting the catalogue with typos.
+ * Distinct brand and department values from the live catalogue — feeds product
+ * forms so staff reuse existing spellings instead of fragmenting the catalogue.
  */
-export async function getProductFacets(): Promise<{ brands: string[]; categories: string[] }> {
+export async function getProductFacets(): Promise<{ brands: string[]; departments: AdminDepartment[] }> {
   const { supabase } = await requireSupabaseContext();
-  const { data } = await supabase.from("products").select("brand, category");
+  const [{ data }, departments] = await Promise.all([
+    supabase.from("products").select("brand").not("external_id", "is", null),
+    getDepartmentsForAdmin(),
+  ]);
 
   const brands = new Set<string>();
-  const categories = new Set<string>();
   for (const row of data ?? []) {
     if (row.brand) brands.add(row.brand);
-    if (row.category) categories.add(row.category);
   }
 
   return {
     brands: [...brands].sort((a, b) => a.localeCompare(b)),
-    categories: [...categories].sort((a, b) => a.localeCompare(b)),
+    departments,
   };
 }
 
@@ -98,12 +103,17 @@ export interface VariantDetail {
   status: StockStatus;
   costPrice: number;
   salePrice: number;
+  compareAtPrice: number | null;
+  discountType: "amount" | "percent" | null;
+  discountValue: number;
+  imageUrls: string[];
   stockByLocation: VariantStockLocation[];
 }
 
 export interface ProductDetail extends InventoryItem {
+  departmentId: string | null;
   barcode: string | null;
-  imageUrl: string | null;
+  imageUrls: string[];
   variants: VariantDetail[];
   recentMovements: {
     id: string;
@@ -127,13 +137,14 @@ export async function getProductDetail(
     await Promise.all([
       supabase.from("product_stock_overview").select("*").eq("product_id", productId).single(),
       supabase
-        .from("variant_stock_overview")
+        .from("product_variants")
         .select(
-          "variant_id, variant_name, attributes, sku, is_default, reorder_point, cost_price, sale_price, total_stock",
+          "id, name, attributes, sku, is_default, reorder_point, cost_price, sale_price, compare_at_price, discount_type, discount_value, image_urls",
         )
         .eq("product_id", productId)
+        .eq("active", true)
         .order("is_default", { ascending: false })
-        .order("variant_name"),
+        .order("name"),
       supabase
         .from("inventory_stock")
         .select("variant_id, quantity, location_id, locations(id, name)")
@@ -171,9 +182,17 @@ export async function getProductDetail(
 
   const { data: product } = await supabase
     .from("products")
-    .select("barcode, image_url")
+    .select("barcode, image_url, image_urls, department_id")
     .eq("id", productId)
     .single();
+
+  const stockByVariant = new Map<string, number>();
+  for (const row of stockRows ?? []) {
+    stockByVariant.set(
+      row.variant_id,
+      (stockByVariant.get(row.variant_id) ?? 0) + row.quantity,
+    );
+  }
 
   const locationsByVariant = new Map<string, VariantStockLocation[]>();
   for (const row of stockRows ?? []) {
@@ -188,25 +207,35 @@ export async function getProductDetail(
     locationsByVariant.set(row.variant_id, list);
   }
 
-  const variants: VariantDetail[] = (variantRows ?? []).map((row) => ({
-    variantId: row.variant_id,
-    name: row.variant_name,
-    attributes: row.attributes ?? {},
-    sku: row.sku,
-    isDefault: row.is_default,
-    totalStock: row.total_stock,
-    reorderPoint: row.reorder_point,
-    status: stockStatus(row.total_stock, row.reorder_point),
-    costPrice: showCosts ? Number(row.cost_price) : 0,
-    salePrice: Number(row.sale_price),
-    stockByLocation: locationsByVariant.get(row.variant_id) ?? [],
-  }));
+  const variants: VariantDetail[] = (variantRows ?? []).map((row) => {
+    const totalStock = stockByVariant.get(row.id) ?? 0;
+    return {
+      variantId: row.id,
+      name: row.name,
+      attributes: row.attributes ?? {},
+      sku: row.sku,
+      isDefault: row.is_default,
+      totalStock,
+      reorderPoint: row.reorder_point,
+      status: stockStatus(totalStock, row.reorder_point),
+      costPrice: showCosts ? Number(row.cost_price) : 0,
+      salePrice: Number(row.sale_price),
+      compareAtPrice: row.compare_at_price != null ? Number(row.compare_at_price) : null,
+      discountType:
+        row.discount_type === "amount" || row.discount_type === "percent"
+          ? row.discount_type
+          : null,
+      discountValue: row.discount_value != null ? Number(row.discount_value) : 0,
+      imageUrls: row.image_urls ?? [],
+      stockByLocation: locationsByVariant.get(row.id) ?? [],
+    };
+  });
 
   return {
     productId: overview.product_id,
     name: overview.name,
     sku: overview.sku,
-    category: overview.category,
+    department: overview.department_name,
     brand: overview.brand,
     unit: overview.unit,
     totalStock: overview.total_stock,
@@ -217,8 +246,11 @@ export async function getProductDetail(
     status: stockStatus(overview.total_stock, overview.reorder_point),
     costPrice: showCosts ? overview.cost_price : 0,
     salePrice: overview.sale_price,
+    inStock: overview.in_stock,
+    imageUrl: overview.image_url,
+    departmentId: product?.department_id ?? null,
     barcode: product?.barcode ?? null,
-    imageUrl: product?.image_url ?? null,
+    imageUrls: product?.image_urls ?? [],
     variants,
     recentMovements: (movementRows ?? []).map((row) => {
       const from = Array.isArray(row.from) ? row.from[0] : row.from;

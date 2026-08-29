@@ -45,7 +45,7 @@ export function ProductPerformanceTable({ rows }: { rows: ProductPerformanceRow[
                     <TableCell className="row-py">
                       <span className="truncate text-row-title font-medium">{row.name}</span>
                       <p className="text-meta text-muted-foreground">
-                        {row.sku ?? "No SKU"} • {row.category ?? "Uncategorized"}
+                        {row.sku ?? "No SKU"} • {row.department ?? "Uncategorised"}
                       </p>
                     </TableCell>
                     <TableCell className="row-py">

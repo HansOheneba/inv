@@ -20,7 +20,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { StatusBadge } from "@/components/inventory/status-badge";
+import { ProductImage } from "@/components/inventory/product-image";
 import type { InventoryItem, ProductDetail, VariantStockLocation } from "@/lib/data/inventory";
+import { variantSummary } from "@/lib/inventory/variant-attributes";
 
 const MOVEMENT_ICON: Record<string, React.ComponentType<{ className?: string }>> = {
   receive: ArrowDownToLine,
@@ -61,31 +63,40 @@ export function ProductDetailSheet({
         {item ? (
           <>
             <SheetHeader className="pb-2">
-              <div className="flex items-start justify-between gap-2 pr-10">
-                <SheetTitle className="text-row-title">{item.name}</SheetTitle>
-                {canEdit ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="shrink-0 gap-1.5"
-                    nativeButton={false}
-                    render={<Link href={`/inventory/${item.productId}/edit`} />}
-                  >
-                    <Pencil className="size-3.5" />
-                    Edit
-                  </Button>
-                ) : null}
+              <div className="flex items-start gap-3 pr-10">
+                <ProductImage
+                  src={visibleDetail?.imageUrls[0] ?? item.imageUrl}
+                  alt={item.name}
+                  size="lg"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <SheetTitle className="text-row-title">{item.name}</SheetTitle>
+                    {canEdit ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0 gap-1.5"
+                        nativeButton={false}
+                        render={<Link href={`/inventory/${item.productId}/edit`} />}
+                      >
+                        <Pencil className="size-3.5" />
+                        Edit
+                      </Button>
+                    ) : null}
+                  </div>
+                  <SheetDescription className="flex flex-wrap items-center gap-x-2 gap-y-1 text-meta">
+                    {item.brand ? (
+                      <span className="font-medium text-foreground">
+                        {item.brand}
+                      </span>
+                    ) : null}
+                    {item.department ? <span>{item.department}</span> : null}
+                    {item.sku ? <span>SKU {item.sku}</span> : null}
+                    <StatusBadge status={item.status} />
+                  </SheetDescription>
+                </div>
               </div>
-              <SheetDescription className="flex flex-wrap items-center gap-x-2 gap-y-1 text-meta">
-                {item.brand ? (
-                  <span className="font-medium text-foreground">
-                    {item.brand}
-                  </span>
-                ) : null}
-                {item.category ? <span>{item.category}</span> : null}
-                {item.sku ? <span>SKU {item.sku}</span> : null}
-                <StatusBadge status={item.status} />
-              </SheetDescription>
             </SheetHeader>
 
             <div className="grid grid-cols-3 gap-2 px-4">
@@ -135,10 +146,22 @@ export function ProductDetailSheet({
                         className="rounded-md border p-2.5"
                       >
                         <div className="mb-1.5 flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-row-title font-medium">
-                              {variant.name}
-                            </span>
+                          <div className="flex min-w-0 items-center gap-2">
+                            <ProductImage
+                              src={variant.imageUrls[0] ?? visibleDetail.imageUrls[0] ?? item.imageUrl}
+                              alt={variant.name}
+                              size="sm"
+                            />
+                            <div className="min-w-0">
+                              <span className="text-row-title font-medium">
+                                {variant.name}
+                              </span>
+                              {variantSummary(variant.attributes) ? (
+                                <p className="truncate text-caption text-muted-foreground">
+                                  {variantSummary(variant.attributes)}
+                                </p>
+                              ) : null}
+                            </div>
                             <StatusBadge status={variant.status} />
                           </div>
                           <span className="shrink-0 text-row-value font-semibold tabular-nums">

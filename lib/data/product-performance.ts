@@ -5,7 +5,7 @@ export interface ProductPerformanceRow {
   productId: string;
   name: string;
   sku: string | null;
-  category: string | null;
+  department: string | null;
   unit: string;
   totalStock: number;
   status: StockStatus;
@@ -74,7 +74,7 @@ export async function getProductPerformance(options?: {
       productId: item.productId,
       name: item.name,
       sku: item.sku,
-      category: item.category,
+      department: item.department,
       unit: item.unit,
       totalStock: item.totalStock,
       status: item.status,

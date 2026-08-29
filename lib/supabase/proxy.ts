@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const PUBLIC_PATHS = ["/login", "/auth"];
+const PUBLIC_PATHS = ["/login", "/auth", "/api/catalog", "/api/orders", "/api/auth", "/api/customer"];
 
 /**
  * Refreshes the Supabase session on every navigation and redirects

@@ -72,19 +72,50 @@ export interface Database {
         Insert: Partial<Database["public"]["Tables"]["sales_channels"]["Row"]>;
         Update: Partial<Database["public"]["Tables"]["sales_channels"]["Row"]>;
       } & NoRelationships;
+      departments: {
+        Row: {
+          id: string;
+          external_id: string;
+          slug: string;
+          name: string;
+          parent_id: string | null;
+          sort_order: number;
+          image: string;
+          description: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["departments"]["Row"]> & {
+          external_id: string;
+          slug: string;
+          name: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["departments"]["Row"]>;
+      } & NoRelationships;
       products: {
         Row: {
           id: string;
+          external_id: string | null;
+          slug: string | null;
           name: string;
           sku: string | null;
           barcode: string | null;
           category: string | null;
+          department_id: string | null;
           brand: string | null;
+          description: string;
           unit: string;
           reorder_point: number;
           cost_price: number;
           sale_price: number;
+          compare_at_price: number | null;
+          in_stock: boolean;
+          popularity: number;
+          attributes: Record<string, string>;
+          tags: string[];
+          keywords: string[];
           image_url: string | null;
+          image_urls: string[];
+          catalog_created_at: string | null;
           created_by: string | null;
           created_at: string;
         };
@@ -94,13 +125,18 @@ export interface Database {
       product_variants: {
         Row: {
           id: string;
+          external_id: string | null;
           product_id: string;
           name: string;
           sku: string | null;
           barcode: string | null;
           attributes: Record<string, string>;
+          image_urls: string[] | null;
           cost_price: number;
           sale_price: number;
+          compare_at_price: number | null;
+          discount_type: "amount" | "percent" | null;
+          discount_value: number | null;
           reorder_point: number;
           active: boolean;
           is_default: boolean;
@@ -225,6 +261,8 @@ export interface Database {
         Row: {
           id: string;
           order_number: number;
+          customer_id: string | null;
+          tracking_number: string | null;
           customer_name: string;
           customer_phone: string | null;
           customer_email: string | null;
@@ -237,6 +275,9 @@ export interface Database {
           notes: string | null;
           discount: number;
           shipping_fee: number;
+          subtotal: number | null;
+          total: number | null;
+          delivery_date: string | null;
           payment_status: PaymentStatus;
           payment_method: PaymentMethod | null;
           payment_reference: string | null;
@@ -263,6 +304,12 @@ export interface Database {
           quantity: number;
           unit_price: number;
           spec_note: string | null;
+          product_external_id: string | null;
+          product_slug: string | null;
+          product_name: string | null;
+          image_url: string | null;
+          variant_external_id: string | null;
+          line_attributes: Record<string, string>;
         };
         Insert: Partial<Database["public"]["Tables"]["order_items"]["Row"]> & {
           order_id: string;
@@ -271,6 +318,93 @@ export interface Database {
           quantity: number;
         };
         Update: Partial<Database["public"]["Tables"]["order_items"]["Row"]>;
+      } & NoRelationships;
+      storefront_customers: {
+        Row: {
+          id: string;
+          external_id: string;
+          name: string;
+          phone: string;
+          email: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["storefront_customers"]["Row"]> & {
+          external_id: string;
+          phone: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["storefront_customers"]["Row"]>;
+      } & NoRelationships;
+      customer_auth_codes: {
+        Row: {
+          id: string;
+          phone: string;
+          code: string;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["customer_auth_codes"]["Row"]> & {
+          phone: string;
+          code: string;
+          expires_at: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["customer_auth_codes"]["Row"]>;
+      } & NoRelationships;
+      customer_sessions: {
+        Row: {
+          id: string;
+          customer_id: string;
+          token: string;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["customer_sessions"]["Row"]> & {
+          customer_id: string;
+          token: string;
+          expires_at: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["customer_sessions"]["Row"]>;
+      } & NoRelationships;
+      customer_addresses: {
+        Row: {
+          id: string;
+          external_id: string;
+          customer_id: string;
+          label: string;
+          name: string;
+          phone: string;
+          region: string;
+          city: string;
+          line: string;
+          maps_url: string | null;
+          is_default: boolean;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["customer_addresses"]["Row"]> & {
+          external_id: string;
+          customer_id: string;
+          name: string;
+          phone: string;
+          region: string;
+          city: string;
+          line: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["customer_addresses"]["Row"]>;
+      } & NoRelationships;
+      customer_saved_items: {
+        Row: {
+          id: string;
+          customer_id: string;
+          product_external_id: string;
+          variant_external_id: string | null;
+          snapshot: Record<string, unknown>;
+          saved_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["customer_saved_items"]["Row"]> & {
+          customer_id: string;
+          product_external_id: string;
+          snapshot: Record<string, unknown>;
+        };
+        Update: Partial<Database["public"]["Tables"]["customer_saved_items"]["Row"]>;
       } & NoRelationships;
       activity_log: {
         Row: {
@@ -322,15 +456,18 @@ export interface Database {
       product_stock_overview: {
         Row: {
           product_id: string;
+          external_id: string | null;
+          slug: string | null;
           name: string;
           sku: string | null;
           barcode: string | null;
-          category: string | null;
+          department_name: string | null;
           unit: string;
           reorder_point: number;
           cost_price: number;
           sale_price: number;
           image_url: string | null;
+          in_stock: boolean;
           total_stock: number;
           primary_location: string | null;
           location_count: number;
@@ -349,7 +486,7 @@ export interface Database {
           barcode: string | null;
           is_default: boolean;
           active: boolean;
-          category: string | null;
+          department_name: string | null;
           unit: string;
           reorder_point: number;
           cost_price: number;

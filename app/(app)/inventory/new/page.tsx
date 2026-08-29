@@ -32,7 +32,7 @@ export default async function NewProductPage() {
             Create a catalogue entry, its variants, and an optional opening stock count.
           </p>
         </div>
-        <NewProductForm options={{ locations, brands: facets.brands, categories: facets.categories }} />
+        <NewProductForm options={{ locations, brands: facets.brands, departments: facets.departments }} />
       </div>
     </PageShell>
   );

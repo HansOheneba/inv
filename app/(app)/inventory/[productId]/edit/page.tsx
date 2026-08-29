@@ -45,7 +45,7 @@ export default async function EditProductPage({
         </div>
         <ProductEditForm
           product={product}
-          options={{ locations, brands: facets.brands, categories: facets.categories }}
+          options={{ locations, brands: facets.brands, departments: facets.departments }}
         />
       </div>
     </PageShell>
