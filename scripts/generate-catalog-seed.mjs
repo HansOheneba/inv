@@ -10,6 +10,23 @@ import { dirname, join } from "node:path";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const contract = JSON.parse(readFileSync(join(root, "docs/admin-api-contract.json"), "utf8"));
 
+let imageManifest = {};
+try {
+  imageManifest = JSON.parse(readFileSync(join(root, "lib/catalog/static-image-urls.json"), "utf8"));
+} catch {
+  // Run scripts/upload-catalog-images.mjs first to populate Supabase URLs.
+}
+
+function resolveCatalogImage(pathOrUrl) {
+  if (!pathOrUrl) return pathOrUrl;
+  if (imageManifest[pathOrUrl]) return imageManifest[pathOrUrl];
+  return pathOrUrl;
+}
+
+function resolveCatalogImages(urls) {
+  return (urls ?? []).map(resolveCatalogImage);
+}
+
 const WAREHOUSE_ID = "11111111-1111-1111-1111-111111111101";
 
 function uuidFromSeed(seed) {
@@ -35,9 +52,9 @@ function sqlTextArray(values) {
 /** Assign product gallery images to a variant when the contract has no variant-level photos. */
 function variantImageUrls(product, variants, variantIndex) {
   const variant = variants[variantIndex];
-  if (variant.imageUrls?.length) return variant.imageUrls;
+  if (variant.imageUrls?.length) return resolveCatalogImages(variant.imageUrls);
 
-  const gallery = product.imageUrls ?? [];
+  const gallery = resolveCatalogImages(product.imageUrls ?? []);
   if (gallery.length === 0) return null;
   if (variants.length === 1) return gallery;
 
@@ -78,7 +95,7 @@ for (const product of contract.seedData.products) {
   const tags = product.tags ?? [];
   const keywords = product.keywords ?? [];
   const attributes = product.attributes ?? {};
-  const imageUrls = product.imageUrls ?? [];
+  const imageUrls = resolveCatalogImages(product.imageUrls ?? []);
   const variants = product.variants ?? [];
   const baseVariant = variants[0];
   const costPrice = baseVariant?.price ?? product.price;

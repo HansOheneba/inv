@@ -91,7 +91,7 @@ select
   '2b31bc53-2333-4302-acb3-36b3b89fc40a'::uuid,
   'Raj pantry',
   'Aged long-grain basmati. Cooks separate and stays fluffy. UK packed. Sold by weight.',
-  '["/images/products/golden-basmati-rice-1.jpg","/images/products/golden-basmati-rice-2.jpg","/images/products/golden-basmati-rice-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/golden-basmati-rice-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/golden-basmati-rice-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/golden-basmati-rice-3.jpg"]'::jsonb,
   215,
   true,
   '2026-05-12'::date,
@@ -103,7 +103,7 @@ select
   45,
   0,
   'pcs',
-  '/images/products/golden-basmati-rice-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/golden-basmati-rice-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-001');
 
 insert into public.product_variants (
@@ -116,7 +116,7 @@ select
   '1kg',
   'RICE-BAS-1',
   '{"Weight":"1kg"}'::jsonb,
-  '["/images/products/golden-basmati-rice-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/golden-basmati-rice-1.jpg"]'::jsonb,
   45,
   45,
   0,
@@ -140,7 +140,7 @@ select
   '5kg',
   'RICE-BAS-5',
   '{"Weight":"5kg"}'::jsonb,
-  '["/images/products/golden-basmati-rice-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/golden-basmati-rice-2.jpg"]'::jsonb,
   189,
   189,
   0,
@@ -164,7 +164,7 @@ select
   '10kg',
   'RICE-BAS-10',
   '{"Weight":"10kg"}'::jsonb,
-  '["/images/products/golden-basmati-rice-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/golden-basmati-rice-3.jpg"]'::jsonb,
   349,
   349,
   0,
@@ -191,7 +191,7 @@ select
   '2b31bc53-2333-4302-acb3-36b3b89fc40a'::uuid,
   'Raj pantry',
   'Soft, floral jasmine rice milled for everyday pots. Packed in the UK.',
-  '["/images/products/jasmine-fragrant-rice-1.jpg","/images/products/jasmine-fragrant-rice-2.jpg","/images/products/jasmine-fragrant-rice-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/jasmine-fragrant-rice-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/jasmine-fragrant-rice-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/jasmine-fragrant-rice-3.jpg"]'::jsonb,
   null,
   true,
   '2026-04-02'::date,
@@ -203,7 +203,7 @@ select
   42,
   0,
   'pcs',
-  '/images/products/jasmine-fragrant-rice-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/jasmine-fragrant-rice-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-002');
 
 insert into public.product_variants (
@@ -216,7 +216,7 @@ select
   '1kg',
   'RICE-JAS-1',
   '{"Weight":"1kg"}'::jsonb,
-  '["/images/products/jasmine-fragrant-rice-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/jasmine-fragrant-rice-1.jpg"]'::jsonb,
   42,
   42,
   0,
@@ -240,7 +240,7 @@ select
   '5kg',
   'RICE-JAS-5',
   '{"Weight":"5kg"}'::jsonb,
-  '["/images/products/jasmine-fragrant-rice-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/jasmine-fragrant-rice-2.jpg"]'::jsonb,
   165,
   165,
   0,
@@ -267,7 +267,7 @@ select
   '2b31bc53-2333-4302-acb3-36b3b89fc40a'::uuid,
   null,
   'Wholegrain rice with the bran left on. Nutty, slower cook.',
-  '["/images/products/brown-long-grain-rice-1.jpg","/images/products/brown-long-grain-rice-2.jpg","/images/products/brown-long-grain-rice-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/brown-long-grain-rice-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/brown-long-grain-rice-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/brown-long-grain-rice-3.jpg"]'::jsonb,
   null,
   true,
   '2026-03-18'::date,
@@ -279,7 +279,7 @@ select
   155,
   0,
   'pcs',
-  '/images/products/brown-long-grain-rice-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/brown-long-grain-rice-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-003');
 
 insert into public.product_variants (
@@ -292,7 +292,7 @@ select
   'Default',
   'BROWN-LONG-G',
   '{"Weight":"5kg"}'::jsonb,
-  '["/images/products/brown-long-grain-rice-1.jpg","/images/products/brown-long-grain-rice-2.jpg","/images/products/brown-long-grain-rice-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/brown-long-grain-rice-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/brown-long-grain-rice-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/brown-long-grain-rice-3.jpg"]'::jsonb,
   155,
   155,
   0,
@@ -321,7 +321,7 @@ select
   '7de95327-6fa1-4984-ad6a-9b64003e2dfd'::uuid,
   null,
   'First cold press in dark glass. For finishing, not deep frying.',
-  '["/images/products/extra-virgin-olive-oil-1.jpg","/images/products/extra-virgin-olive-oil-2.jpg","/images/products/extra-virgin-olive-oil-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/extra-virgin-olive-oil-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/extra-virgin-olive-oil-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/extra-virgin-olive-oil-3.jpg"]'::jsonb,
   null,
   true,
   '2026-03-11'::date,
@@ -333,7 +333,7 @@ select
   55,
   0,
   'pcs',
-  '/images/products/extra-virgin-olive-oil-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/extra-virgin-olive-oil-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-004');
 
 insert into public.product_variants (
@@ -346,7 +346,7 @@ select
   '250ml',
   'OIL-OLV-250',
   '{"Volume":"250ml"}'::jsonb,
-  '["/images/products/extra-virgin-olive-oil-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/extra-virgin-olive-oil-1.jpg"]'::jsonb,
   55,
   55,
   0,
@@ -370,7 +370,7 @@ select
   '500ml',
   'OIL-OLV-500',
   '{"Volume":"500ml"}'::jsonb,
-  '["/images/products/extra-virgin-olive-oil-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/extra-virgin-olive-oil-2.jpg"]'::jsonb,
   95,
   95,
   0,
@@ -394,7 +394,7 @@ select
   '1L',
   'OIL-OLV-1L',
   '{"Volume":"1L"}'::jsonb,
-  '["/images/products/extra-virgin-olive-oil-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/extra-virgin-olive-oil-3.jpg"]'::jsonb,
   165,
   165,
   0,
@@ -421,7 +421,7 @@ select
   '7de95327-6fa1-4984-ad6a-9b64003e2dfd'::uuid,
   null,
   'Refined coconut oil for high-heat cooking. Neutral taste.',
-  '["/images/products/coconut-cooking-oil-1.jpg","/images/products/coconut-cooking-oil-2.jpg","/images/products/coconut-cooking-oil-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/coconut-cooking-oil-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/coconut-cooking-oil-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/coconut-cooking-oil-3.jpg"]'::jsonb,
   null,
   true,
   '2026-02-14'::date,
@@ -433,7 +433,7 @@ select
   62,
   0,
   'pcs',
-  '/images/products/coconut-cooking-oil-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/coconut-cooking-oil-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-005');
 
 insert into public.product_variants (
@@ -446,7 +446,7 @@ select
   'Default',
   'COCONUT-COOK',
   '{"Volume":"500ml"}'::jsonb,
-  '["/images/products/coconut-cooking-oil-1.jpg","/images/products/coconut-cooking-oil-2.jpg","/images/products/coconut-cooking-oil-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/coconut-cooking-oil-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/coconut-cooking-oil-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/coconut-cooking-oil-3.jpg"]'::jsonb,
   62,
   62,
   0,
@@ -475,7 +475,7 @@ select
   '7de95327-6fa1-4984-ad6a-9b64003e2dfd'::uuid,
   null,
   'Peanut oil with a light roast note. For frying and marinades.',
-  '["/images/products/cold-pressed-groundnut-oil-1.jpg","/images/products/cold-pressed-groundnut-oil-2.jpg","/images/products/cold-pressed-groundnut-oil-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cold-pressed-groundnut-oil-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cold-pressed-groundnut-oil-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cold-pressed-groundnut-oil-3.jpg"]'::jsonb,
   null,
   true,
   '2026-01-30'::date,
@@ -487,7 +487,7 @@ select
   58,
   0,
   'pcs',
-  '/images/products/cold-pressed-groundnut-oil-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cold-pressed-groundnut-oil-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-006');
 
 insert into public.product_variants (
@@ -500,7 +500,7 @@ select
   'Default',
   'COLD-PRESSED',
   '{"Volume":"500ml"}'::jsonb,
-  '["/images/products/cold-pressed-groundnut-oil-1.jpg","/images/products/cold-pressed-groundnut-oil-2.jpg","/images/products/cold-pressed-groundnut-oil-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cold-pressed-groundnut-oil-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cold-pressed-groundnut-oil-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cold-pressed-groundnut-oil-3.jpg"]'::jsonb,
   58,
   58,
   0,
@@ -529,7 +529,7 @@ select
   '49f735ba-a8e3-4498-a3a6-c11bcbbfd4fd'::uuid,
   null,
   'Thick strained yoghurt. Keep chilled after opening.',
-  '["/images/products/greek-style-yoghurt-1.jpg","/images/products/greek-style-yoghurt-2.jpg","/images/products/greek-style-yoghurt-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/greek-style-yoghurt-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/greek-style-yoghurt-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/greek-style-yoghurt-3.jpg"]'::jsonb,
   null,
   true,
   '2026-07-08'::date,
@@ -541,7 +541,7 @@ select
   28,
   0,
   'pcs',
-  '/images/products/greek-style-yoghurt-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/greek-style-yoghurt-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-007');
 
 insert into public.product_variants (
@@ -554,7 +554,7 @@ select
   'Default',
   'GREEK-STYLE-',
   '{"Pack":"500g"}'::jsonb,
-  '["/images/products/greek-style-yoghurt-1.jpg","/images/products/greek-style-yoghurt-2.jpg","/images/products/greek-style-yoghurt-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/greek-style-yoghurt-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/greek-style-yoghurt-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/greek-style-yoghurt-3.jpg"]'::jsonb,
   28,
   28,
   0,
@@ -583,7 +583,7 @@ select
   '49f735ba-a8e3-4498-a3a6-c11bcbbfd4fd'::uuid,
   null,
   'Whole milk powder for tea, baking and emergency fridge days.',
-  '["/images/products/full-cream-milk-powder-1.jpg","/images/products/full-cream-milk-powder-2.jpg","/images/products/full-cream-milk-powder-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/full-cream-milk-powder-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/full-cream-milk-powder-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/full-cream-milk-powder-3.jpg"]'::jsonb,
   null,
   true,
   '2026-04-21'::date,
@@ -595,7 +595,7 @@ select
   85,
   0,
   'pcs',
-  '/images/products/full-cream-milk-powder-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/full-cream-milk-powder-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-008');
 
 insert into public.product_variants (
@@ -608,7 +608,7 @@ select
   'Default',
   'FULL-CREAM-M',
   '{"Weight":"900g"}'::jsonb,
-  '["/images/products/full-cream-milk-powder-1.jpg","/images/products/full-cream-milk-powder-2.jpg","/images/products/full-cream-milk-powder-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/full-cream-milk-powder-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/full-cream-milk-powder-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/full-cream-milk-powder-3.jpg"]'::jsonb,
   85,
   85,
   0,
@@ -637,7 +637,7 @@ select
   '49f735ba-a8e3-4498-a3a6-c11bcbbfd4fd'::uuid,
   null,
   'Shelf-stable evaporated milk. Six tins in a wrap.',
-  '["/images/products/evaporated-milk-six-pack-1.jpg","/images/products/evaporated-milk-six-pack-2.jpg","/images/products/evaporated-milk-six-pack-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/evaporated-milk-six-pack-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/evaporated-milk-six-pack-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/evaporated-milk-six-pack-3.jpg"]'::jsonb,
   null,
   true,
   '2026-05-03'::date,
@@ -649,7 +649,7 @@ select
   72,
   0,
   'pcs',
-  '/images/products/evaporated-milk-six-pack-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/evaporated-milk-six-pack-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-009');
 
 insert into public.product_variants (
@@ -662,7 +662,7 @@ select
   'Default',
   'EVAPORATED-M',
   '{"Pack":"6 x 410g"}'::jsonb,
-  '["/images/products/evaporated-milk-six-pack-1.jpg","/images/products/evaporated-milk-six-pack-2.jpg","/images/products/evaporated-milk-six-pack-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/evaporated-milk-six-pack-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/evaporated-milk-six-pack-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/evaporated-milk-six-pack-3.jpg"]'::jsonb,
   72,
   72,
   0,
@@ -691,7 +691,7 @@ select
   '5d202ab0-96eb-4484-a9ac-89bb65a8a44b'::uuid,
   null,
   'Light body mist for after lotion. UK retail bottle.',
-  '["/images/products/velvet-musk-body-mist-1.jpg","/images/products/velvet-musk-body-mist-2.jpg","/images/products/velvet-musk-body-mist-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/velvet-musk-body-mist-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/velvet-musk-body-mist-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/velvet-musk-body-mist-3.jpg"]'::jsonb,
   null,
   true,
   '2026-06-08'::date,
@@ -703,7 +703,7 @@ select
   89,
   0,
   'pcs',
-  '/images/products/velvet-musk-body-mist-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/velvet-musk-body-mist-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-010');
 
 insert into public.product_variants (
@@ -716,7 +716,7 @@ select
   'Default',
   'VELVET-MUSK-',
   '{"Volume":"200ml"}'::jsonb,
-  '["/images/products/velvet-musk-body-mist-1.jpg","/images/products/velvet-musk-body-mist-2.jpg","/images/products/velvet-musk-body-mist-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/velvet-musk-body-mist-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/velvet-musk-body-mist-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/velvet-musk-body-mist-3.jpg"]'::jsonb,
   89,
   89,
   0,
@@ -745,7 +745,7 @@ select
   'bd53cecb-d699-4fbd-a324-f1b78b01a754'::uuid,
   null,
   'Concentrated perfume oil. Roll on pulse points. Boxed.',
-  '["/images/products/saffron-cedar-attar-oil-1.jpg","/images/products/saffron-cedar-attar-oil-2.jpg","/images/products/saffron-cedar-attar-oil-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/saffron-cedar-attar-oil-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/saffron-cedar-attar-oil-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/saffron-cedar-attar-oil-3.jpg"]'::jsonb,
   null,
   true,
   '2026-08-01'::date,
@@ -757,7 +757,7 @@ select
   145,
   0,
   'pcs',
-  '/images/products/saffron-cedar-attar-oil-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/saffron-cedar-attar-oil-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-011');
 
 insert into public.product_variants (
@@ -770,7 +770,7 @@ select
   'Default',
   'SAFFRON-CEDA',
   '{"Volume":"12ml"}'::jsonb,
-  '["/images/products/saffron-cedar-attar-oil-1.jpg","/images/products/saffron-cedar-attar-oil-2.jpg","/images/products/saffron-cedar-attar-oil-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/saffron-cedar-attar-oil-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/saffron-cedar-attar-oil-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/saffron-cedar-attar-oil-3.jpg"]'::jsonb,
   145,
   145,
   0,
@@ -799,7 +799,7 @@ select
   'bd53cecb-d699-4fbd-a324-f1b78b01a754'::uuid,
   null,
   'Soft rose EDT for daytime. Retail boxed 50ml.',
-  '["/images/products/rose-nectar-eau-de-toilette-1.jpg","/images/products/rose-nectar-eau-de-toilette-2.jpg","/images/products/rose-nectar-eau-de-toilette-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/rose-nectar-eau-de-toilette-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/rose-nectar-eau-de-toilette-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/rose-nectar-eau-de-toilette-3.jpg"]'::jsonb,
   null,
   true,
   '2026-06-19'::date,
@@ -811,7 +811,7 @@ select
   210,
   0,
   'pcs',
-  '/images/products/rose-nectar-eau-de-toilette-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/rose-nectar-eau-de-toilette-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-012');
 
 insert into public.product_variants (
@@ -824,7 +824,7 @@ select
   'Default',
   'ROSE-NECTAR-',
   '{"Volume":"50ml"}'::jsonb,
-  '["/images/products/rose-nectar-eau-de-toilette-1.jpg","/images/products/rose-nectar-eau-de-toilette-2.jpg","/images/products/rose-nectar-eau-de-toilette-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/rose-nectar-eau-de-toilette-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/rose-nectar-eau-de-toilette-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/rose-nectar-eau-de-toilette-3.jpg"]'::jsonb,
   210,
   210,
   0,
@@ -853,7 +853,7 @@ select
   'b04891c2-6cb6-42bc-a013-4056a828c4d9'::uuid,
   null,
   'Cotton-linen wrap cut for warm weather. UK goods.',
-  '["/images/products/ivory-linen-wrap-dress-1.jpg","/images/products/ivory-linen-wrap-dress-2.jpg","/images/products/ivory-linen-wrap-dress-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-linen-wrap-dress-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-linen-wrap-dress-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-linen-wrap-dress-3.jpg"]'::jsonb,
   null,
   true,
   '2026-05-22'::date,
@@ -865,7 +865,7 @@ select
   420,
   0,
   'pcs',
-  '/images/products/ivory-linen-wrap-dress-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-linen-wrap-dress-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-013');
 
 insert into public.product_variants (
@@ -878,7 +878,7 @@ select
   'S',
   'DRS-LIN-S',
   '{"Size":"S"}'::jsonb,
-  '["/images/products/ivory-linen-wrap-dress-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-linen-wrap-dress-1.jpg"]'::jsonb,
   420,
   420,
   0,
@@ -902,7 +902,7 @@ select
   'M',
   'DRS-LIN-M',
   '{"Size":"M"}'::jsonb,
-  '["/images/products/ivory-linen-wrap-dress-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-linen-wrap-dress-2.jpg"]'::jsonb,
   420,
   420,
   0,
@@ -926,7 +926,7 @@ select
   'L',
   'DRS-LIN-L',
   '{"Size":"L"}'::jsonb,
-  '["/images/products/ivory-linen-wrap-dress-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-linen-wrap-dress-3.jpg"]'::jsonb,
   420,
   420,
   0,
@@ -953,7 +953,7 @@ select
   'b04891c2-6cb6-42bc-a013-4056a828c4d9'::uuid,
   null,
   'Crisp poplin day dress. Machine wash cold.',
-  '["/images/products/cotton-poplin-day-dress-1.jpg","/images/products/cotton-poplin-day-dress-2.jpg","/images/products/cotton-poplin-day-dress-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cotton-poplin-day-dress-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cotton-poplin-day-dress-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cotton-poplin-day-dress-3.jpg"]'::jsonb,
   null,
   true,
   '2026-04-09'::date,
@@ -965,7 +965,7 @@ select
   380,
   0,
   'pcs',
-  '/images/products/cotton-poplin-day-dress-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cotton-poplin-day-dress-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-014');
 
 insert into public.product_variants (
@@ -978,7 +978,7 @@ select
   'S',
   'DRS-POP-S',
   '{"Size":"S"}'::jsonb,
-  '["/images/products/cotton-poplin-day-dress-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cotton-poplin-day-dress-1.jpg"]'::jsonb,
   380,
   380,
   0,
@@ -1002,7 +1002,7 @@ select
   'M',
   'DRS-POP-M',
   '{"Size":"M"}'::jsonb,
-  '["/images/products/cotton-poplin-day-dress-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cotton-poplin-day-dress-2.jpg"]'::jsonb,
   380,
   380,
   0,
@@ -1026,7 +1026,7 @@ select
   'L',
   'DRS-POP-L',
   '{"Size":"L"}'::jsonb,
-  '["/images/products/cotton-poplin-day-dress-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/cotton-poplin-day-dress-3.jpg"]'::jsonb,
   380,
   380,
   0,
@@ -1053,7 +1053,7 @@ select
   'b04891c2-6cb6-42bc-a013-4056a828c4d9'::uuid,
   null,
   'A-line wax print dress. Pattern placement varies by piece.',
-  '["/images/products/ankara-print-a-line-dress-1.jpg","/images/products/ankara-print-a-line-dress-2.jpg","/images/products/ankara-print-a-line-dress-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ankara-print-a-line-dress-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ankara-print-a-line-dress-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ankara-print-a-line-dress-3.jpg"]'::jsonb,
   null,
   true,
   '2026-07-11'::date,
@@ -1065,7 +1065,7 @@ select
   455,
   0,
   'pcs',
-  '/images/products/ankara-print-a-line-dress-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ankara-print-a-line-dress-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-015');
 
 insert into public.product_variants (
@@ -1078,7 +1078,7 @@ select
   'S',
   'DRS-ANK-S',
   '{"Size":"S"}'::jsonb,
-  '["/images/products/ankara-print-a-line-dress-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ankara-print-a-line-dress-1.jpg"]'::jsonb,
   455,
   455,
   0,
@@ -1102,7 +1102,7 @@ select
   'M',
   'DRS-ANK-M',
   '{"Size":"M"}'::jsonb,
-  '["/images/products/ankara-print-a-line-dress-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ankara-print-a-line-dress-2.jpg"]'::jsonb,
   455,
   455,
   0,
@@ -1126,7 +1126,7 @@ select
   'L',
   'DRS-ANK-L',
   '{"Size":"L"}'::jsonb,
-  '["/images/products/ankara-print-a-line-dress-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ankara-print-a-line-dress-3.jpg"]'::jsonb,
   455,
   455,
   0,
@@ -1153,7 +1153,7 @@ select
   'b04891c2-6cb6-42bc-a013-4056a828c4d9'::uuid,
   null,
   'Midi shirt dress with a belt. USA goods.',
-  '["/images/products/terracotta-midi-shirt-dress-1.jpg","/images/products/terracotta-midi-shirt-dress-2.jpg","/images/products/terracotta-midi-shirt-dress-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/terracotta-midi-shirt-dress-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/terracotta-midi-shirt-dress-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/terracotta-midi-shirt-dress-3.jpg"]'::jsonb,
   470,
   true,
   '2026-03-28'::date,
@@ -1165,7 +1165,7 @@ select
   399,
   0,
   'pcs',
-  '/images/products/terracotta-midi-shirt-dress-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/terracotta-midi-shirt-dress-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-016');
 
 insert into public.product_variants (
@@ -1178,7 +1178,7 @@ select
   'Default',
   'TERRACOTTA-M',
   '{"Length":"Midi"}'::jsonb,
-  '["/images/products/terracotta-midi-shirt-dress-1.jpg","/images/products/terracotta-midi-shirt-dress-2.jpg","/images/products/terracotta-midi-shirt-dress-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/terracotta-midi-shirt-dress-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/terracotta-midi-shirt-dress-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/terracotta-midi-shirt-dress-3.jpg"]'::jsonb,
   399,
   399,
   0,
@@ -1207,7 +1207,7 @@ select
   'b04891c2-6cb6-42bc-a013-4056a828c4d9'::uuid,
   null,
   'Floaty chiffon maxi. Lined to the knee.',
-  '["/images/products/pleated-chiffon-maxi-dress-1.jpg","/images/products/pleated-chiffon-maxi-dress-2.jpg","/images/products/pleated-chiffon-maxi-dress-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pleated-chiffon-maxi-dress-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pleated-chiffon-maxi-dress-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pleated-chiffon-maxi-dress-3.jpg"]'::jsonb,
   null,
   true,
   '2026-05-30'::date,
@@ -1219,7 +1219,7 @@ select
   520,
   0,
   'pcs',
-  '/images/products/pleated-chiffon-maxi-dress-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pleated-chiffon-maxi-dress-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-017');
 
 insert into public.product_variants (
@@ -1232,7 +1232,7 @@ select
   'Default',
   'PLEATED-CHIF',
   '{"Length":"Maxi"}'::jsonb,
-  '["/images/products/pleated-chiffon-maxi-dress-1.jpg","/images/products/pleated-chiffon-maxi-dress-2.jpg","/images/products/pleated-chiffon-maxi-dress-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pleated-chiffon-maxi-dress-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pleated-chiffon-maxi-dress-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pleated-chiffon-maxi-dress-3.jpg"]'::jsonb,
   520,
   520,
   0,
@@ -1261,7 +1261,7 @@ select
   'ac0745a8-09ef-497d-a8b7-2bc0e512b3f2'::uuid,
   'UK goods',
   'Black structured shoulder bag. Not affiliated with any high-street house. Check the listing photos.',
-  '["/images/products/structured-shoulder-bag-1.jpg","/images/products/structured-shoulder-bag-2.jpg","/images/products/structured-shoulder-bag-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/structured-shoulder-bag-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/structured-shoulder-bag-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/structured-shoulder-bag-3.jpg"]'::jsonb,
   null,
   true,
   '2026-07-28'::date,
@@ -1273,7 +1273,7 @@ select
   399,
   0,
   'pcs',
-  '/images/products/structured-shoulder-bag-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/structured-shoulder-bag-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-018');
 
 insert into public.product_variants (
@@ -1286,7 +1286,7 @@ select
   'Black',
   'BAG-STR-BLK',
   '{"Color":"Black"}'::jsonb,
-  '["/images/products/structured-shoulder-bag-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/structured-shoulder-bag-1.jpg"]'::jsonb,
   399,
   399,
   0,
@@ -1310,7 +1310,7 @@ select
   'Tan',
   'BAG-STR-TAN',
   '{"Color":"Tan"}'::jsonb,
-  '["/images/products/structured-shoulder-bag-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/structured-shoulder-bag-2.jpg"]'::jsonb,
   399,
   399,
   0,
@@ -1337,7 +1337,7 @@ select
   'dd67387d-dda1-456f-a262-98981e21cf67'::uuid,
   null,
   'Low court sneakers. USA stock. Pick colour and size.',
-  '["/images/products/canvas-court-sneakers-1.jpg","/images/products/canvas-court-sneakers-2.jpg","/images/products/canvas-court-sneakers-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/canvas-court-sneakers-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/canvas-court-sneakers-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/canvas-court-sneakers-3.jpg"]'::jsonb,
   null,
   true,
   '2026-08-05'::date,
@@ -1349,7 +1349,7 @@ select
   890,
   0,
   'pcs',
-  '/images/products/canvas-court-sneakers-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/canvas-court-sneakers-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-019');
 
 insert into public.product_variants (
@@ -1362,7 +1362,7 @@ select
   'White / 40',
   'SNK-WHT-40',
   '{"Color":"White","Size":"40"}'::jsonb,
-  '["/images/products/canvas-court-sneakers-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/canvas-court-sneakers-1.jpg"]'::jsonb,
   890,
   890,
   0,
@@ -1386,7 +1386,7 @@ select
   'White / 41',
   'SNK-WHT-41',
   '{"Color":"White","Size":"41"}'::jsonb,
-  '["/images/products/canvas-court-sneakers-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/canvas-court-sneakers-1.jpg"]'::jsonb,
   890,
   890,
   0,
@@ -1410,7 +1410,7 @@ select
   'White / 42',
   'SNK-WHT-42',
   '{"Color":"White","Size":"42"}'::jsonb,
-  '["/images/products/canvas-court-sneakers-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/canvas-court-sneakers-1.jpg"]'::jsonb,
   890,
   890,
   0,
@@ -1434,7 +1434,7 @@ select
   'Navy / 40',
   'SNK-NVY-40',
   '{"Color":"Navy","Size":"40"}'::jsonb,
-  '["/images/products/canvas-court-sneakers-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/canvas-court-sneakers-2.jpg"]'::jsonb,
   890,
   890,
   0,
@@ -1458,7 +1458,7 @@ select
   'Navy / 41',
   'SNK-NVY-41',
   '{"Color":"Navy","Size":"41"}'::jsonb,
-  '["/images/products/canvas-court-sneakers-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/canvas-court-sneakers-2.jpg"]'::jsonb,
   890,
   890,
   0,
@@ -1482,7 +1482,7 @@ select
   'Navy / 42',
   'SNK-NVY-42',
   '{"Color":"Navy","Size":"42"}'::jsonb,
-  '["/images/products/canvas-court-sneakers-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/canvas-court-sneakers-2.jpg"]'::jsonb,
   890,
   890,
   0,
@@ -1509,7 +1509,7 @@ select
   '320f3b5d-3caa-4d14-ac70-d6b36e95c739'::uuid,
   null,
   'Moulded footbed slides. Size 40 is waiting on a restock.',
-  '["/images/products/pool-slides-1.jpg","/images/products/pool-slides-2.jpg","/images/products/pool-slides-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pool-slides-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pool-slides-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pool-slides-3.jpg"]'::jsonb,
   null,
   true,
   '2026-07-15'::date,
@@ -1521,7 +1521,7 @@ select
   249,
   0,
   'pcs',
-  '/images/products/pool-slides-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pool-slides-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-020');
 
 insert into public.product_variants (
@@ -1534,7 +1534,7 @@ select
   '38',
   'SLD-BLK-38',
   '{"Size":"38"}'::jsonb,
-  '["/images/products/pool-slides-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pool-slides-1.jpg"]'::jsonb,
   249,
   249,
   0,
@@ -1558,7 +1558,7 @@ select
   '39',
   'SLD-BLK-39',
   '{"Size":"39"}'::jsonb,
-  '["/images/products/pool-slides-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pool-slides-2.jpg"]'::jsonb,
   249,
   249,
   0,
@@ -1582,7 +1582,7 @@ select
   '40',
   'SLD-BLK-40',
   '{"Size":"40"}'::jsonb,
-  '["/images/products/pool-slides-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/pool-slides-3.jpg"]'::jsonb,
   249,
   249,
   0,
@@ -1609,7 +1609,7 @@ select
   '0bad1c6f-5628-44d0-a1ba-f547e34659d6'::uuid,
   null,
   'Penny loafer in smooth leather. UK last. Currently sold out.',
-  '["/images/products/leather-loafer-1.jpg","/images/products/leather-loafer-2.jpg","/images/products/leather-loafer-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/leather-loafer-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/leather-loafer-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/leather-loafer-3.jpg"]'::jsonb,
   null,
   false,
   '2026-06-30'::date,
@@ -1621,7 +1621,7 @@ select
   1290,
   0,
   'pcs',
-  '/images/products/leather-loafer-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/leather-loafer-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-021');
 
 insert into public.product_variants (
@@ -1634,7 +1634,7 @@ select
   '40',
   'LOF-BLK-40',
   '{"Size":"40"}'::jsonb,
-  '["/images/products/leather-loafer-1.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/leather-loafer-1.jpg"]'::jsonb,
   1290,
   1290,
   0,
@@ -1658,7 +1658,7 @@ select
   '41',
   'LOF-BLK-41',
   '{"Size":"41"}'::jsonb,
-  '["/images/products/leather-loafer-2.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/leather-loafer-2.jpg"]'::jsonb,
   1290,
   1290,
   0,
@@ -1685,7 +1685,7 @@ select
   '338fda17-4045-4790-a5c9-a9af29470171'::uuid,
   null,
   'Warm amber and oud. Boxed 100ml. Check the bottle in the photos.',
-  '["/images/products/amber-oud-eau-de-parfum-1.jpg","/images/products/amber-oud-eau-de-parfum-2.jpg","/images/products/amber-oud-eau-de-parfum-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/amber-oud-eau-de-parfum-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/amber-oud-eau-de-parfum-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/amber-oud-eau-de-parfum-3.jpg"]'::jsonb,
   null,
   true,
   '2026-07-02'::date,
@@ -1697,7 +1697,7 @@ select
   345,
   0,
   'pcs',
-  '/images/products/amber-oud-eau-de-parfum-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/amber-oud-eau-de-parfum-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-022');
 
 insert into public.product_variants (
@@ -1710,7 +1710,7 @@ select
   'Default',
   'AMBER-OUD-EA',
   '{"Volume":"100ml"}'::jsonb,
-  '["/images/products/amber-oud-eau-de-parfum-1.jpg","/images/products/amber-oud-eau-de-parfum-2.jpg","/images/products/amber-oud-eau-de-parfum-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/amber-oud-eau-de-parfum-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/amber-oud-eau-de-parfum-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/amber-oud-eau-de-parfum-3.jpg"]'::jsonb,
   345,
   345,
   0,
@@ -1739,7 +1739,7 @@ select
   '338fda17-4045-4790-a5c9-a9af29470171'::uuid,
   null,
   'White floral jasmine. Retail boxed 100ml.',
-  '["/images/products/ivory-jasmine-eau-de-parfum-1.jpg","/images/products/ivory-jasmine-eau-de-parfum-2.jpg","/images/products/ivory-jasmine-eau-de-parfum-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-jasmine-eau-de-parfum-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-jasmine-eau-de-parfum-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-jasmine-eau-de-parfum-3.jpg"]'::jsonb,
   null,
   true,
   '2026-04-18'::date,
@@ -1751,7 +1751,7 @@ select
   345,
   0,
   'pcs',
-  '/images/products/ivory-jasmine-eau-de-parfum-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-jasmine-eau-de-parfum-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-023');
 
 insert into public.product_variants (
@@ -1764,7 +1764,7 @@ select
   'Default',
   'IVORY-JASMIN',
   '{"Volume":"100ml"}'::jsonb,
-  '["/images/products/ivory-jasmine-eau-de-parfum-1.jpg","/images/products/ivory-jasmine-eau-de-parfum-2.jpg","/images/products/ivory-jasmine-eau-de-parfum-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-jasmine-eau-de-parfum-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-jasmine-eau-de-parfum-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ivory-jasmine-eau-de-parfum-3.jpg"]'::jsonb,
   345,
   345,
   0,
@@ -1793,7 +1793,7 @@ select
   '4b682d90-be5f-440c-a1b4-434e73f6a883'::uuid,
   null,
   'Open weave basket for market runs and laundry.',
-  '["/images/products/woven-storage-basket-1.jpg","/images/products/woven-storage-basket-2.jpg","/images/products/woven-storage-basket-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/woven-storage-basket-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/woven-storage-basket-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/woven-storage-basket-3.jpg"]'::jsonb,
   null,
   true,
   '2026-02-09'::date,
@@ -1805,7 +1805,7 @@ select
   180,
   0,
   'pcs',
-  '/images/products/woven-storage-basket-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/woven-storage-basket-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-024');
 
 insert into public.product_variants (
@@ -1818,7 +1818,7 @@ select
   'Default',
   'WOVEN-STORAG',
   '{"Material":"Rattan"}'::jsonb,
-  '["/images/products/woven-storage-basket-1.jpg","/images/products/woven-storage-basket-2.jpg","/images/products/woven-storage-basket-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/woven-storage-basket-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/woven-storage-basket-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/woven-storage-basket-3.jpg"]'::jsonb,
   180,
   180,
   0,
@@ -1847,7 +1847,7 @@ select
   'b3b45a67-10f9-408b-acb8-192349795828'::uuid,
   null,
   'Set of stoneware bowls. Dishwasher safe.',
-  '["/images/products/ceramic-serving-bowl-set-1.jpg","/images/products/ceramic-serving-bowl-set-2.jpg","/images/products/ceramic-serving-bowl-set-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ceramic-serving-bowl-set-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ceramic-serving-bowl-set-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ceramic-serving-bowl-set-3.jpg"]'::jsonb,
   175,
   true,
   '2026-01-20'::date,
@@ -1859,7 +1859,7 @@ select
   145,
   0,
   'pcs',
-  '/images/products/ceramic-serving-bowl-set-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ceramic-serving-bowl-set-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-025');
 
 insert into public.product_variants (
@@ -1872,7 +1872,7 @@ select
   'Default',
   'CERAMIC-SERV',
   '{"Set":"3 pieces"}'::jsonb,
-  '["/images/products/ceramic-serving-bowl-set-1.jpg","/images/products/ceramic-serving-bowl-set-2.jpg","/images/products/ceramic-serving-bowl-set-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ceramic-serving-bowl-set-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ceramic-serving-bowl-set-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/ceramic-serving-bowl-set-3.jpg"]'::jsonb,
   145,
   145,
   0,
@@ -1901,7 +1901,7 @@ select
   'b3b45a67-10f9-408b-acb8-192349795828'::uuid,
   null,
   'Spoon, spatula and ladle in one bundle.',
-  '["/images/products/bamboo-kitchen-utensil-set-1.jpg","/images/products/bamboo-kitchen-utensil-set-2.jpg","/images/products/bamboo-kitchen-utensil-set-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/bamboo-kitchen-utensil-set-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/bamboo-kitchen-utensil-set-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/bamboo-kitchen-utensil-set-3.jpg"]'::jsonb,
   null,
   true,
   '2026-02-22'::date,
@@ -1913,7 +1913,7 @@ select
   95,
   0,
   'pcs',
-  '/images/products/bamboo-kitchen-utensil-set-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/bamboo-kitchen-utensil-set-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-026');
 
 insert into public.product_variants (
@@ -1926,7 +1926,7 @@ select
   'Default',
   'BAMBOO-KITCH',
   '{"Set":"4 pieces"}'::jsonb,
-  '["/images/products/bamboo-kitchen-utensil-set-1.jpg","/images/products/bamboo-kitchen-utensil-set-2.jpg","/images/products/bamboo-kitchen-utensil-set-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/bamboo-kitchen-utensil-set-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/bamboo-kitchen-utensil-set-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/bamboo-kitchen-utensil-set-3.jpg"]'::jsonb,
   95,
   95,
   0,
@@ -1955,7 +1955,7 @@ select
   'b3b45a67-10f9-408b-acb8-192349795828'::uuid,
   null,
   'Pair of linen towels. Soften after the first wash.',
-  '["/images/products/linen-tea-towels-1.jpg","/images/products/linen-tea-towels-2.jpg","/images/products/linen-tea-towels-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/linen-tea-towels-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/linen-tea-towels-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/linen-tea-towels-3.jpg"]'::jsonb,
   null,
   true,
   '2026-03-05'::date,
@@ -1967,7 +1967,7 @@ select
   75,
   0,
   'pcs',
-  '/images/products/linen-tea-towels-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/linen-tea-towels-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-027');
 
 insert into public.product_variants (
@@ -1980,7 +1980,7 @@ select
   'Default',
   'LINEN-TEA-TO',
   '{"Pack":"2"}'::jsonb,
-  '["/images/products/linen-tea-towels-1.jpg","/images/products/linen-tea-towels-2.jpg","/images/products/linen-tea-towels-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/linen-tea-towels-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/linen-tea-towels-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/linen-tea-towels-3.jpg"]'::jsonb,
   75,
   75,
   0,
@@ -2009,7 +2009,7 @@ select
   '4b682d90-be5f-440c-a1b4-434e73f6a883'::uuid,
   null,
   'Solid laundry soap with lavender. UK goods.',
-  '["/images/products/lavender-laundry-soap-bar-1.jpg","/images/products/lavender-laundry-soap-bar-2.jpg","/images/products/lavender-laundry-soap-bar-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/lavender-laundry-soap-bar-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/lavender-laundry-soap-bar-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/lavender-laundry-soap-bar-3.jpg"]'::jsonb,
   null,
   true,
   '2026-06-12'::date,
@@ -2021,7 +2021,7 @@ select
   32,
   0,
   'pcs',
-  '/images/products/lavender-laundry-soap-bar-1.jpg'
+  'https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/lavender-laundry-soap-bar-1.jpg'
 where not exists (select 1 from public.products where external_id = 'p-028');
 
 insert into public.product_variants (
@@ -2034,7 +2034,7 @@ select
   'Default',
   'LAVENDER-LAU',
   '{"Weight":"200g"}'::jsonb,
-  '["/images/products/lavender-laundry-soap-bar-1.jpg","/images/products/lavender-laundry-soap-bar-2.jpg","/images/products/lavender-laundry-soap-bar-3.jpg"]'::jsonb,
+  '["https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/lavender-laundry-soap-bar-1.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/lavender-laundry-soap-bar-2.jpg","https://xwqdvbemihvapnftjsqh.supabase.co/storage/v1/object/public/product-images/catalog/lavender-laundry-soap-bar-3.jpg"]'::jsonb,
   32,
   32,
   0,
