@@ -70,6 +70,8 @@ export interface CreateOrderResult {
   orderId: string;
   trackingNumber: string;
   paymentReference?: string;
+  paymentStatus: "pending" | "paid" | "demo";
+  paymentMessage?: string;
 }
 
 export interface CustomerAddress {

@@ -1,4 +1,5 @@
 import { getCatalogClient } from "@/lib/catalog/client";
+import { createPaymentReference, initiateReceiveMoney } from "@/lib/hubtel/payments";
 import { computeShipping, normalizePhone, trackingNumber } from "@/lib/storefront/utils";
 import { mapAdminStatus, type CreateOrderInput, type CreateOrderResult, type StorefrontOrder } from "@/lib/storefront/types";
 import { upsertCustomerByPhone } from "@/lib/storefront/session";
@@ -295,7 +296,7 @@ export async function createStorefrontOrder(
     linkedCustomerId = customer.id;
   }
 
-  const paymentReference = `HUBTEL-DEMO-${Date.now()}`;
+  const paymentReference = createPaymentReference();
   const supabase = getCatalogClient();
 
   const { data: order, error: orderError } = await supabase
@@ -344,10 +345,44 @@ export async function createStorefrontOrder(
 
   const tracking = order.tracking_number ?? trackingNumber(order.order_number);
 
+  let paymentStatus: CreateOrderResult["paymentStatus"] = "pending";
+  let paymentMessage = "Approve the MoMo prompt on your phone to complete payment.";
+
+  try {
+    const payment = await initiateReceiveMoney({
+      clientReference: paymentReference,
+      amount: computedTotal,
+      customerName: input.customer.name,
+      customerPhone: phone,
+      customerEmail: input.customer.email,
+      description: `Raj Kollections order ${tracking}`,
+    });
+
+    paymentMessage = payment.message;
+
+    if (payment.status === "demo") {
+      paymentStatus = "demo";
+    } else if (payment.responseCode === "0000") {
+      paymentStatus = "paid";
+      await supabase
+        .from("orders")
+        .update({ payment_status: "paid" })
+        .eq("id", order.id);
+    }
+  } catch (paymentError) {
+    console.error("[orders] Hubtel payment initiation failed:", paymentError);
+    paymentMessage =
+      paymentError instanceof Error
+        ? paymentError.message
+        : "Order saved but payment could not be started. Contact support with your tracking number.";
+  }
+
   return {
     reference: paymentReference,
     orderId: String(order.order_number),
     trackingNumber: tracking,
     paymentReference,
+    paymentStatus,
+    paymentMessage,
   };
 }

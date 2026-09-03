@@ -5,6 +5,7 @@ import {
   listCustomerOrders,
 } from "@/lib/storefront/orders";
 import type { CreateOrderInput } from "@/lib/storefront/types";
+import { resolveCustomerIdFromRequest } from "@/lib/storefront/session";
 import { requireCustomerSession } from "@/lib/api/session";
 import { errorResponse, jsonResponse, optionsResponse } from "@/lib/api/cors";
 
@@ -30,9 +31,7 @@ export async function POST(request: Request) {
       return errorResponse(request, "Invalid order payload.");
     }
 
-    const session = await requireCustomerSession(request);
-    const customerUuid = session.customerUuid;
-
+    const customerUuid = await resolveCustomerIdFromRequest(request);
     const result = await createStorefrontOrder(body, customerUuid);
     return jsonResponse(request, result, { status: 201 });
   } catch (error) {

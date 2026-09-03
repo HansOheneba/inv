@@ -50,12 +50,25 @@ Fill in:
 | `SUPABASE_JWKS_URL` | `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` |
 | `NEXT_PUBLIC_SUPABASE_URL` | Same as `SUPABASE_URL` — exposed to the browser for Realtime |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Same as `SUPABASE_PUBLISHABLE_KEY` — exposed to the browser for Realtime |
+| `PORTAL_URL` | Public origin of this app (e.g. `https://portal.rajkollections.com`) — Hubtel payment callbacks |
+| `HUBTEL_CLIENT_ID` / `HUBTEL_CLIENT_SECRET` | Hubtel API credentials — SMS OTP + MoMo receive-money |
+| `HUBTEL_MERCHANT_ID` | Hubtel POS Sales ID for receive-money |
+| `HUBTEL_SMS_SENDER_ID` | Registered Hubtel sender ID (defaults to `RajKol`) |
 
 Almost every Supabase call happens on the server (Server Components / Server Actions). The two
 `NEXT_PUBLIC_` values are the only exception: the Orders board opens a browser Realtime socket to
 react to new orders instantly, which needs the URL + publishable key client-side. The socket still
 authenticates as the signed-in user via the session cookie, so RLS applies. The secret key and
 JWKS URL are **never** exposed to the browser.
+
+**Storefront API migrations:** after `0006_single_warehouse.sql`, also run `0007_website_orders.sql`,
+`0008_catalog.sql`, `0009_storefront_api.sql`, and `0010_inventory_catalog.sql`, then
+`supabase/seed_catalog.sql` for the 28-product storefront catalog. Without these, `/catalog/*` and
+`/auth/*` routes will fail.
+
+**Hubtel:** OTP and MoMo run server-side only. Without credentials, the API falls back to demo mode
+(console OTP, orders saved as unpaid). Set `PORTAL_URL` to your deployed portal origin so Hubtel can
+POST payment callbacks to `/webhooks/hubtel`.
 
 ### 4. Run it
 

@@ -28,6 +28,10 @@ const nextConfig: NextConfig = {
         source: "/customer/:path*",
         destination: "/api/customer/:path*",
       },
+      {
+        source: "/webhooks/:path*",
+        destination: "/api/webhooks/:path*",
+      },
     ];
   },
 };

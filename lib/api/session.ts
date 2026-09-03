@@ -4,6 +4,19 @@ import {
 } from "@/lib/storefront/session";
 import { errorResponse } from "@/lib/api/cors";
 
+export async function resolveOptionalCustomerSession(request: Request) {
+  const [customer, customerUuid] = await Promise.all([
+    resolveCustomerFromRequest(request),
+    resolveCustomerIdFromRequest(request),
+  ]);
+
+  if (!customer || !customerUuid) {
+    return { customer: null, customerUuid: null };
+  }
+
+  return { customer, customerUuid };
+}
+
 export async function requireCustomerSession(request: Request) {
   const [customer, customerUuid] = await Promise.all([
     resolveCustomerFromRequest(request),

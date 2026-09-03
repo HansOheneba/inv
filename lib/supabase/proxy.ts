@@ -1,7 +1,38 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const PUBLIC_PATHS = ["/login", "/auth", "/api/catalog", "/api/orders", "/api/auth", "/api/customer"];
+const PUBLIC_PREFIXES = [
+  "/login",
+  "/auth",
+  "/catalog",
+  "/customer",
+  "/webhooks",
+  "/api/catalog",
+  "/api/auth",
+  "/api/customer",
+  "/api/webhooks",
+];
+
+function isStorefrontApiRequest(request: NextRequest): boolean {
+  const { pathname } = request.nextUrl;
+
+  if (PUBLIC_PREFIXES.some((path) => pathname.startsWith(path))) {
+    return true;
+  }
+
+  if (pathname.startsWith("/orders/track") || pathname.startsWith("/api/orders/track")) {
+    return true;
+  }
+
+  // Admin UI and storefront API both live under /orders — allow JSON/API traffic through.
+  if (pathname.startsWith("/orders") || pathname.startsWith("/api/orders")) {
+    if (request.method !== "GET") return true;
+    const accept = request.headers.get("accept") ?? "";
+    return accept.includes("application/json");
+  }
+
+  return false;
+}
 
 /**
  * Refreshes the Supabase session on every navigation and redirects
@@ -33,7 +64,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isPublicPath = PUBLIC_PATHS.some((path) => request.nextUrl.pathname.startsWith(path));
+  const isPublicPath = isStorefrontApiRequest(request);
 
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();

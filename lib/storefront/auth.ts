@@ -1,5 +1,6 @@
 import { getCatalogClient } from "@/lib/catalog/client";
 import { OTP_EXPIRY_MINUTES } from "@/lib/storefront/constants";
+import { sendSms } from "@/lib/hubtel/sms";
 import {
   createSession,
   mapCustomer,
@@ -33,7 +34,12 @@ export async function requestAuthCode(input: {
     await upsertCustomerByPhone({ phone, name: input.profile.name });
   }
 
-  if (process.env.NODE_ENV !== "production") {
+  const sms = await sendSms({
+    to: phone,
+    content: `Your Raj Kollections verification code is ${code}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`,
+  });
+
+  if (sms.demo && process.env.NODE_ENV !== "production") {
     console.info(`[auth] OTP for ${phone}: ${code}`);
   }
 
