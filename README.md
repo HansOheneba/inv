@@ -50,7 +50,7 @@ Fill in:
 | `SUPABASE_JWKS_URL` | `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` |
 | `NEXT_PUBLIC_SUPABASE_URL` | Same as `SUPABASE_URL` — exposed to the browser for Realtime |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Same as `SUPABASE_PUBLISHABLE_KEY` — exposed to the browser for Realtime |
-| `PORTAL_URL` | Public origin of this app (e.g. `https://portal.rajkollections.com`) — Hubtel payment callbacks |
+| `PORTAL_URL` | Portal public origin — **production:** `https://portal.rajkollections.com` (Hubtel callbacks, catalog image URLs) |
 | `HUBTEL_CLIENT_ID` / `HUBTEL_CLIENT_SECRET` | Hubtel API credentials — SMS OTP + MoMo receive-money |
 | `HUBTEL_MERCHANT_ID` | Hubtel POS Sales ID for receive-money |
 | `HUBTEL_SMS_SENDER_ID` | Registered Hubtel sender ID (defaults to `RajKol`) |

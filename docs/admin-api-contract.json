@@ -29,13 +29,15 @@
     }
   },
   "baseUrl": {
+    "production": "https://portal.rajkollections.com",
     "envVar": "NEXT_PUBLIC_API_URL",
     "example": "https://portal.rajkollections.com",
+    "portalEnvVar": "PORTAL_URL",
     "alternatives": [
       "https://portal.rajkollections.com",
       "https://manage.rajkollections.com"
     ],
-    "note": "Set on the storefront to the portal origin (no trailing slash). API routes live on the same host as the admin app."
+    "note": "Storefront sets NEXT_PUBLIC_API_URL to the portal origin (no trailing slash). The portal sets PORTAL_URL to the same value in production for Hubtel callbacks and absolute asset URLs."
   },
   "currency": "GHS",
   "locale": "en-GH",
