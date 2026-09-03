@@ -18,7 +18,7 @@ function generateOtp(): string {
 export async function requestAuthCode(input: {
   phone: string;
   profile?: { name?: string };
-}): Promise<{ ok: true }> {
+}): Promise<{ ok: true; demoCode?: string }> {
   const phone = normalizePhone(input.phone);
   if (!isValidGhanaPhone(phone)) {
     throw new Error("Enter a valid Ghana phone number");
@@ -39,8 +39,10 @@ export async function requestAuthCode(input: {
     content: `Your Raj Kollections verification code is ${code}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`,
   });
 
-  if (sms.demo && process.env.NODE_ENV !== "production") {
-    console.info(`[auth] OTP for ${phone}: ${code}`);
+  // Hubtel not configured — return the code so the storefront can show it (dev/demo).
+  if (sms.demo) {
+    console.info(`[auth] demo OTP for ${phone}: ${code}`);
+    return { ok: true, demoCode: code };
   }
 
   return { ok: true };

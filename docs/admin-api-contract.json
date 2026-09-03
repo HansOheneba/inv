@@ -823,7 +823,7 @@
       "path": "/auth/request-code",
       "auth": false,
       "body": "{ phone, profile?: { name } }",
-      "response": "{ ok: boolean }"
+      "response": "{ ok: true } | { ok: true, demoCode: string } — demoCode when Hubtel SMS is not configured"
     },
     {
       "phase": 2,

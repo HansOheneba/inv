@@ -242,9 +242,21 @@ Content-Type: application/json
 }
 ```
 
-Response: `{ "ok": true }`
+Response **with Hubtel SMS configured:**
 
-Hubtel sends the SMS when configured; in dev the code is logged on the portal server.
+```json
+{ "ok": true }
+```
+
+The code is sent by text message only.
+
+Response **without Hubtel** (current dev/demo setup):
+
+```json
+{ "ok": true, "demoCode": "482913" }
+```
+
+Show `demoCode` on screen and ask the user to type it in — same `verify-code` step as production. Once Hubtel credentials are on the portal, `demoCode` stops appearing and SMS takes over. No storefront code change needed beyond: if `demoCode` is present, display it.
 
 ### 2. Verify code
 
