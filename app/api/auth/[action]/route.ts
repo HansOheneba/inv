@@ -28,7 +28,10 @@ export async function POST(request: Request) {
       const body = (await request.json()) as { name?: string };
       if (!body.name) return errorResponse(request, "Name is required.");
       const result = await completeCustomerProfile({ request, name: body.name });
-      return jsonResponse(request, result);
+      const { setCookie, ...payload } = result;
+      return jsonResponse(request, payload, {
+        headers: setCookie ? { "Set-Cookie": setCookie } : undefined,
+      });
     }
 
     if (action === "logout") {

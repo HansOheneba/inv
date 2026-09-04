@@ -18,6 +18,10 @@ export function corsHeaders(request: Request): HeadersInit {
   };
 }
 
+export function sessionResponseHeaders(refreshedCookie?: string): HeadersInit | undefined {
+  return refreshedCookie ? { "Set-Cookie": refreshedCookie } : undefined;
+}
+
 export function jsonResponse(
   request: Request,
   body: unknown,

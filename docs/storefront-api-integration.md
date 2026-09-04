@@ -266,7 +266,7 @@ POST /auth/verify-code
 { "phone": "233241234567", "code": "123456" }
 ```
 
-Response sets cookie `rk_customer_session` (HttpOnly, 30 days, `SameSite=Lax`).
+Response sets cookie `rk_customer_session` (HttpOnly, sliding 400-day window, `SameSite=Lax`). Active sessions are extended automatically on authenticated API calls when fewer than 30 days remain.
 
 ```ts
 interface VerifyResponse {

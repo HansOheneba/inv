@@ -1,6 +1,6 @@
 import { removeSavedItem } from "@/lib/storefront/customer";
 import { requireCustomerSession } from "@/lib/api/session";
-import { errorResponse, emptyResponse, optionsResponse } from "@/lib/api/cors";
+import { errorResponse, emptyResponse, optionsResponse, sessionResponseHeaders } from "@/lib/api/cors";
 
 interface RouteParams {
   params: Promise<{ productId: string }>;
@@ -14,7 +14,7 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     const { productId } = await params;
     const variantId = new URL(request.url).searchParams.get("variantId");
     await removeSavedItem(session.customerUuid!, productId, variantId);
-    return emptyResponse(request);
+    return emptyResponse(request, 204, sessionResponseHeaders(session.refreshedCookie));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not remove saved item.";
     return errorResponse(request, message, 400);

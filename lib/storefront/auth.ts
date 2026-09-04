@@ -4,7 +4,7 @@ import { sendSms } from "@/lib/hubtel/sms";
 import {
   createSession,
   mapCustomer,
-  resolveCustomerIdFromRequest,
+  resolveSessionFromRequest,
   sessionCookieHeader,
   upsertCustomerByPhone,
   type StorefrontCustomer,
@@ -97,9 +97,9 @@ export async function verifyAuthCode(input: {
 export async function completeCustomerProfile(input: {
   request: Request;
   name: string;
-}): Promise<{ customer: StorefrontCustomer }> {
-  const customerUuid = await resolveCustomerIdFromRequest(input.request);
-  if (!customerUuid) throw new Error("Sign in to complete your profile");
+}): Promise<{ customer: StorefrontCustomer; setCookie?: string }> {
+  const session = await resolveSessionFromRequest(input.request);
+  if (!session) throw new Error("Sign in to complete your profile");
 
   const name = input.name.trim();
   if (!name) throw new Error("Enter your name");
@@ -108,12 +108,15 @@ export async function completeCustomerProfile(input: {
   const { data, error } = await supabase
     .from("storefront_customers")
     .update({ name })
-    .eq("id", customerUuid)
+    .eq("id", session.customerUuid)
     .select("id, external_id, name, phone, email")
     .single();
 
   if (error || !data) throw error ?? new Error("Could not update profile");
-  return { customer: mapCustomer(data) };
+  return {
+    customer: mapCustomer(data),
+    setCookie: session.refreshedCookie,
+  };
 }
 
 export async function logoutCustomer(request: Request): Promise<void> {

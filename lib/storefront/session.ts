@@ -1,6 +1,9 @@
-import { cookies } from "next/headers";
 import { getCatalogClient } from "@/lib/catalog/client";
-import { SESSION_COOKIE, SESSION_DAYS } from "@/lib/storefront/constants";
+import {
+  SESSION_COOKIE,
+  SESSION_DAYS,
+  SESSION_REFRESH_THRESHOLD_DAYS,
+} from "@/lib/storefront/constants";
 import { externalId } from "@/lib/storefront/utils";
 
 interface CustomerRow {
@@ -23,11 +26,34 @@ function first<T>(value: T | T[] | null): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function daysFromNow(days: number): string {
+  return new Date(Date.now() + days * MS_PER_DAY).toISOString();
+}
+
+function shouldRefreshSession(expiresAt: string): boolean {
+  const remainingMs = new Date(expiresAt).getTime() - Date.now();
+  return remainingMs < SESSION_REFRESH_THRESHOLD_DAYS * MS_PER_DAY;
+}
+
+function parseSessionToken(request: Request): string | null {
+  const cookieHeader = request.headers.get("cookie") ?? "";
+  const match = cookieHeader.match(new RegExp(`${SESSION_COOKIE}=([^;]+)`));
+  return match?.[1] ?? null;
+}
+
 export interface StorefrontCustomer {
   id: string;
   name: string;
   phone: string;
   email?: string;
+}
+
+export interface ResolvedSession {
+  customer: StorefrontCustomer;
+  customerUuid: string;
+  refreshedCookie?: string;
 }
 
 export function mapCustomer(row: CustomerRow): StorefrontCustomer {
@@ -43,7 +69,7 @@ export function mapCustomer(row: CustomerRow): StorefrontCustomer {
 export async function createSession(customerId: string): Promise<string> {
   const supabase = getCatalogClient();
   const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
-  const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  const expiresAt = daysFromNow(SESSION_DAYS);
 
   const { error } = await supabase.from("customer_sessions").insert({
     customer_id: customerId,
@@ -55,12 +81,10 @@ export async function createSession(customerId: string): Promise<string> {
   return token;
 }
 
-export async function resolveCustomerFromRequest(
+export async function resolveSessionFromRequest(
   request: Request,
-): Promise<StorefrontCustomer | null> {
-  const cookieHeader = request.headers.get("cookie") ?? "";
-  const match = cookieHeader.match(new RegExp(`${SESSION_COOKIE}=([^;]+)`));
-  const token = match?.[1];
+): Promise<ResolvedSession | null> {
+  const token = parseSessionToken(request);
   if (!token) return null;
 
   const supabase = getCatalogClient();
@@ -76,24 +100,36 @@ export async function resolveCustomerFromRequest(
   const row = data as unknown as SessionRow;
   const customer = first(row.storefront_customers);
   if (!customer) return null;
-  return mapCustomer(customer);
+
+  let refreshedCookie: string | undefined;
+  if (shouldRefreshSession(row.expires_at)) {
+    const { error: updateError } = await supabase
+      .from("customer_sessions")
+      .update({ expires_at: daysFromNow(SESSION_DAYS) })
+      .eq("id", row.id);
+
+    if (!updateError) {
+      refreshedCookie = sessionCookieHeader(token);
+    }
+  }
+
+  return {
+    customer: mapCustomer(customer),
+    customerUuid: row.customer_id,
+    refreshedCookie,
+  };
+}
+
+export async function resolveCustomerFromRequest(
+  request: Request,
+): Promise<StorefrontCustomer | null> {
+  const session = await resolveSessionFromRequest(request);
+  return session?.customer ?? null;
 }
 
 export async function resolveCustomerIdFromRequest(request: Request): Promise<string | null> {
-  const cookieHeader = request.headers.get("cookie") ?? "";
-  const match = cookieHeader.match(new RegExp(`${SESSION_COOKIE}=([^;]+)`));
-  const token = match?.[1];
-  if (!token) return null;
-
-  const supabase = getCatalogClient();
-  const { data } = await supabase
-    .from("customer_sessions")
-    .select("customer_id")
-    .eq("token", token)
-    .gt("expires_at", new Date().toISOString())
-    .maybeSingle();
-
-  return data?.customer_id ?? null;
+  const session = await resolveSessionFromRequest(request);
+  return session?.customerUuid ?? null;
 }
 
 export function sessionCookieHeader(token: string): string {

@@ -1,35 +1,16 @@
-import {
-  resolveCustomerFromRequest,
-  resolveCustomerIdFromRequest,
-} from "@/lib/storefront/session";
+import { resolveSessionFromRequest } from "@/lib/storefront/session";
 import { errorResponse } from "@/lib/api/cors";
 
-export async function resolveOptionalCustomerSession(request: Request) {
-  const [customer, customerUuid] = await Promise.all([
-    resolveCustomerFromRequest(request),
-    resolveCustomerIdFromRequest(request),
-  ]);
-
-  if (!customer || !customerUuid) {
-    return { customer: null, customerUuid: null };
-  }
-
-  return { customer, customerUuid };
-}
-
 export async function requireCustomerSession(request: Request) {
-  const [customer, customerUuid] = await Promise.all([
-    resolveCustomerFromRequest(request),
-    resolveCustomerIdFromRequest(request),
-  ]);
-
-  if (!customer || !customerUuid) {
+  const session = await resolveSessionFromRequest(request);
+  if (!session) {
     return {
       customer: null,
       customerUuid: null,
+      refreshedCookie: undefined,
       response: errorResponse(request, "Sign in required.", 401),
     };
   }
 
-  return { customer, customerUuid, response: null };
+  return { ...session, response: null };
 }

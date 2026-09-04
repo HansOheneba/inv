@@ -1,7 +1,7 @@
 import { getOrderByPublicId } from "@/lib/storefront/orders";
 import { getCatalogClient } from "@/lib/catalog/client";
 import { requireCustomerSession } from "@/lib/api/session";
-import { errorResponse, jsonResponse, optionsResponse } from "@/lib/api/cors";
+import { errorResponse, jsonResponse, optionsResponse, sessionResponseHeaders } from "@/lib/api/cors";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -30,7 +30,9 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     if (!order) return errorResponse(request, "Order not found.", 404);
 
-    return jsonResponse(request, order);
+    return jsonResponse(request, order, {
+      headers: sessionResponseHeaders(session.refreshedCookie),
+    });
   } catch (error) {
     console.error("[orders] GET /orders/:id:", error);
     return errorResponse(request, "Could not load order.", 500);
