@@ -291,7 +291,6 @@ export async function createStorefrontOrder(
     const customer = await upsertCustomerByPhone({
       phone,
       name: input.customer.name,
-      email: input.customer.email,
     });
     linkedCustomerId = customer.id;
   }

@@ -12,6 +12,8 @@ interface CustomerRow {
   name: string;
   phone: string;
   email: string | null;
+  pending_email?: string | null;
+  date_of_birth?: string | null;
 }
 
 interface SessionRow {
@@ -48,6 +50,8 @@ export interface StorefrontCustomer {
   name: string;
   phone: string;
   email?: string;
+  pendingEmail?: string;
+  dateOfBirth?: string;
 }
 
 export interface ResolvedSession {
@@ -63,6 +67,8 @@ export function mapCustomer(row: CustomerRow): StorefrontCustomer {
     phone: row.phone,
   };
   if (row.email) customer.email = row.email;
+  if (row.pending_email) customer.pendingEmail = row.pending_email;
+  if (row.date_of_birth) customer.dateOfBirth = row.date_of_birth.slice(0, 10);
   return customer;
 }
 
@@ -90,7 +96,9 @@ export async function resolveSessionFromRequest(
   const supabase = getCatalogClient();
   const { data, error } = await supabase
     .from("customer_sessions")
-    .select("id, customer_id, token, expires_at, storefront_customers(id, external_id, name, phone, email)")
+    .select(
+      "id, customer_id, token, expires_at, storefront_customers(id, external_id, name, phone, email, pending_email, date_of_birth)",
+    )
     .eq("token", token)
     .gt("expires_at", new Date().toISOString())
     .maybeSingle();
@@ -145,24 +153,23 @@ export function clearSessionCookieHeader(): string {
 export async function upsertCustomerByPhone(input: {
   phone: string;
   name?: string;
-  email?: string;
 }): Promise<CustomerRow> {
   const supabase = getCatalogClient();
   const { data: existing } = await supabase
     .from("storefront_customers")
-    .select("id, external_id, name, phone, email")
+    .select("id, external_id, name, phone, email, pending_email, date_of_birth")
     .eq("phone", input.phone)
     .maybeSingle();
 
   if (existing) {
-    if (input.name || input.email) {
+    if (input.name) {
       await supabase
         .from("storefront_customers")
         .update({
-          name: input.name ?? existing.name,
-          email: input.email ?? existing.email,
+          name: input.name,
         })
         .eq("id", existing.id);
+      existing.name = input.name;
     }
     return existing;
   }
@@ -173,9 +180,8 @@ export async function upsertCustomerByPhone(input: {
       external_id: externalId("cust"),
       name: input.name ?? "",
       phone: input.phone,
-      email: input.email ?? null,
     })
-    .select("id, external_id, name, phone, email")
+    .select("id, external_id, name, phone, email, pending_email, date_of_birth")
     .single();
 
   if (error || !created) throw error ?? new Error("Could not create customer");

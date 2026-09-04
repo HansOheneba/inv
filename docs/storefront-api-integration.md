@@ -100,6 +100,9 @@ The portal exposes **clean paths** (no `/api` prefix). Internally these rewrite 
 | `POST` | `/auth/complete-profile` | session | Set name after first login |
 | `POST` | `/auth/logout` | session | Clear session |
 | `GET` | `/customer/me` | session | Current customer |
+| `PATCH` | `/customer/me` | session | Update birthday and/or email |
+| `POST` | `/customer/email/resend` | session | Resend pending email confirmation |
+| `POST` | `/auth/verify-email` | — | Confirm email from link token |
 | `GET/POST` | `/customer/addresses` | session | List / create addresses |
 | `PATCH/DELETE` | `/customer/addresses/:id` | session | Update / delete address |
 | `GET/PUT/POST` | `/customer/saved` | session | Saved items (wishlist) |
@@ -279,7 +282,9 @@ interface Customer {
   id: string;    // external id, e.g. "cust-abc123"
   name: string;
   phone: string;
-  email?: string;
+  email?: string;          // verified only
+  pendingEmail?: string;   // awaiting confirmation
+  dateOfBirth?: string;    // "YYYY-MM-DD"
 }
 ```
 
@@ -301,7 +306,43 @@ GET /customer/me
 
 Returns `Customer` or `401` if not signed in.
 
-### 5. Logout
+### 5. Update profile (birthday / email)
+
+Birthday and email are optional and collected after sign-up — not during OTP login.
+
+```http
+PATCH /customer/me
+
+{ "dateOfBirth": "1992-08-14" }
+{ "email": "ama@example.com" }
+{ "dateOfBirth": null, "email": null }   // clear fields
+```
+
+- `dateOfBirth` — `YYYY-MM-DD`, year ≥ 1900, not in the future. Omit to leave unchanged; `null` clears.
+- `email` — starts confirmation flow. `email` on `Customer` is verified-only; unconfirmed address is returned as `pendingEmail`. `null` clears verified and pending email.
+
+Confirmation link: `https://www.rajkollections.com/verify-email?token=…` (24h TTL, single use).
+
+```http
+POST /customer/email/resend
+```
+
+Resends confirmation for `pendingEmail`. Rate limit: 3 sends per customer per hour and 3 per email address per hour.
+
+```http
+POST /auth/verify-email
+
+{ "token": "…" }
+```
+
+```ts
+interface VerifyEmailResponse {
+  ok: true;
+  customer?: Customer;   // included when the browser session matches the account
+}
+```
+
+### 6. Logout
 
 ```http
 POST /auth/logout
@@ -527,7 +568,7 @@ interface SavedItem {
 ### Wire next (HTTP client may exist — connect it)
 
 - [ ] Auth: request-code → verify-code → complete-profile
-- [ ] Account: `/customer/me`, addresses CRUD
+- [ ] Account: `/customer/me` (GET/PATCH), `/customer/email/resend`, `/auth/verify-email`, addresses CRUD
 - [ ] Saved items sync
 
 ### Stay local (no API)

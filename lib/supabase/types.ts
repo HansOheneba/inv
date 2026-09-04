@@ -326,6 +326,8 @@ export interface Database {
           name: string;
           phone: string;
           email: string | null;
+          pending_email: string | null;
+          date_of_birth: string | null;
           created_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["storefront_customers"]["Row"]> & {
@@ -333,6 +335,37 @@ export interface Database {
           phone: string;
         };
         Update: Partial<Database["public"]["Tables"]["storefront_customers"]["Row"]>;
+      } & NoRelationships;
+      customer_email_verifications: {
+        Row: {
+          id: string;
+          customer_id: string;
+          email: string;
+          token_hash: string;
+          expires_at: string;
+          used_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["customer_email_verifications"]["Row"]> & {
+          customer_id: string;
+          email: string;
+          token_hash: string;
+          expires_at: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["customer_email_verifications"]["Row"]>;
+      } & NoRelationships;
+      customer_email_send_log: {
+        Row: {
+          id: string;
+          customer_id: string;
+          email: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["customer_email_send_log"]["Row"]> & {
+          customer_id: string;
+          email: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["customer_email_send_log"]["Row"]>;
       } & NoRelationships;
       customer_auth_codes: {
         Row: {

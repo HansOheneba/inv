@@ -1,5 +1,6 @@
 import { completeCustomerProfile, logoutCustomer, requestAuthCode, verifyAuthCode } from "@/lib/storefront/auth";
-import { clearSessionCookieHeader } from "@/lib/storefront/session";
+import { verifyCustomerEmail } from "@/lib/storefront/profile";
+import { clearSessionCookieHeader, resolveSessionFromRequest } from "@/lib/storefront/session";
 import { errorResponse, jsonResponse, emptyResponse, optionsResponse } from "@/lib/api/cors";
 
 export async function POST(request: Request) {
@@ -32,6 +33,18 @@ export async function POST(request: Request) {
       return jsonResponse(request, payload, {
         headers: setCookie ? { "Set-Cookie": setCookie } : undefined,
       });
+    }
+
+    if (action === "verify-email") {
+      const body = (await request.json()) as { token?: string };
+      if (!body.token) return errorResponse(request, "Token is required.");
+      const result = await verifyCustomerEmail(body.token);
+      const session = await resolveSessionFromRequest(request);
+      const payload: { ok: true; customer?: typeof result.customer } = { ok: true };
+      if (session?.customerUuid === result.customerUuid) {
+        payload.customer = result.customer;
+      }
+      return jsonResponse(request, payload);
     }
 
     if (action === "logout") {

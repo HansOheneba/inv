@@ -109,7 +109,7 @@ export async function completeCustomerProfile(input: {
     .from("storefront_customers")
     .update({ name })
     .eq("id", session.customerUuid)
-    .select("id, external_id, name, phone, email")
+    .select("id, external_id, name, phone, email, pending_email, date_of_birth")
     .single();
 
   if (error || !data) throw error ?? new Error("Could not update profile");
